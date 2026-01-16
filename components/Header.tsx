@@ -3,9 +3,10 @@ import React from 'react';
 interface HeaderProps {
   toggleTheme: () => void;
   isDark: boolean;
+  onAddClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,11 +35,27 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark }) => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
+            <button 
+              onClick={onAddClick}
+              className="hidden sm:flex items-center gap-2 h-9 px-4 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span>Add Application</span>
+            </button>
+
             <button className="hidden sm:flex items-center gap-2 h-9 px-4 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shadow-blue-500/20">
               <span className="material-symbols-outlined text-[18px]">sync</span>
               <span>Sync Gmail</span>
             </button>
             
+            {/* Mobile Add Icon */}
+            <button 
+              onClick={onAddClick}
+              className="sm:hidden flex items-center justify-center size-9 bg-green-600 text-white rounded-lg"
+            >
+              <span className="material-symbols-outlined text-[20px]">add</span>
+            </button>
+
             {/* Mobile Sync Icon */}
             <button className="sm:hidden flex items-center justify-center size-9 bg-primary text-white rounded-lg">
               <span className="material-symbols-outlined text-[20px]">sync</span>
