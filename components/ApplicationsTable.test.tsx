@@ -37,25 +37,32 @@ describe('Phase 3: Last Update Column', () => {
   ];
 
   const mockSelectApplication = vi.fn();
+  const mockSort = vi.fn();
+  const mockFilterStatus = vi.fn();
+  const mockFilterDateRange = vi.fn();
+  const mockClearFilters = vi.fn();
+
+  const defaultProps = {
+    applications: mockApplications,
+    onSelectApplication: mockSelectApplication,
+    sortField: 'none' as const,
+    sortOrder: 'desc' as const,
+    onSort: mockSort,
+    statusFilter: [],
+    dateRangeFilter: 'all' as const,
+    onFilterStatus: mockFilterStatus,
+    onFilterDateRange: mockFilterDateRange,
+    onClearFilters: mockClearFilters,
+  };
 
   it('should render Last Update column header', () => {
-    render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    render(<ApplicationsTable {...defaultProps} />);
     
     expect(screen.getByText('Last Update')).toBeInTheDocument();
   });
 
   it('should display lastUpdate value for each application', () => {
-    render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    render(<ApplicationsTable {...defaultProps} />);
     
     expect(screen.getByText('Jan 14, 2026')).toBeInTheDocument();
     const oct22Dates = screen.getAllByText('Oct 22, 2023');
@@ -63,12 +70,7 @@ describe('Phase 3: Last Update Column', () => {
   });
 
   it('should render all required columns', () => {
-    render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    render(<ApplicationsTable {...defaultProps} />);
     
     expect(screen.getByText('Company')).toBeInTheDocument();
     expect(screen.getByText('Role')).toBeInTheDocument();
@@ -79,12 +81,7 @@ describe('Phase 3: Last Update Column', () => {
   });
 
   it('should render application data in correct columns', () => {
-    render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    render(<ApplicationsTable {...defaultProps} />);
     
     // Check company names
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
@@ -101,12 +98,7 @@ describe('Phase 3: Last Update Column', () => {
   });
 
   it('should display correct application count in pagination', () => {
-    const { container } = render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    const { container } = render(<ApplicationsTable {...defaultProps} />);
     
     expect(screen.getByText(/Showing/)).toBeInTheDocument();
     // Check pagination text - text is split across spans, so we check the container
@@ -118,24 +110,14 @@ describe('Phase 3: Last Update Column', () => {
   });
 
   it('should render empty table when no applications', () => {
-    render(
-      <ApplicationsTable 
-        applications={[]} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    render(<ApplicationsTable {...defaultProps} applications={[]} />);
     
     expect(screen.getByText('Recent Applications')).toBeInTheDocument();
     expect(screen.getByText('Last Update')).toBeInTheDocument();
   });
 
   it('should have Last Update column between Date Applied and Status', () => {
-    const { container } = render(
-      <ApplicationsTable 
-        applications={mockApplications} 
-        onSelectApplication={mockSelectApplication} 
-      />
-    );
+    const { container } = render(<ApplicationsTable {...defaultProps} />);
     
     const headers = container.querySelectorAll('th');
     const headerTexts = Array.from(headers).map(th => th.textContent);

@@ -6,12 +6,21 @@ import ApplicationDrawer from './components/ApplicationDrawer';
 import AddApplicationModal, { NewApplication } from './components/AddApplicationModal';
 import { Application, MOCK_APPLICATIONS } from './types';
 
+export type SortField = 'company' | 'dateApplied' | 'lastUpdate' | 'status' | 'none';
+export type SortOrder = 'asc' | 'desc';
+
 const App: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>(MOCK_APPLICATIONS);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  
+  // Sort & Filter state
+  const [sortField, setSortField] = useState<SortField>('none');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [dateRangeFilter, setDateRangeFilter] = useState<'all' | '7days' | '30days' | '90days'>('all');
 
   // Initialize theme
   useEffect(() => {
@@ -84,6 +93,100 @@ const App: React.FC = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  // Sort and filter applications
+  const getFilteredAndSortedApplications = (): Application[] => {
+    let filtered = [...applications];
+
+    // Apply status filter
+    if (statusFilter.length > 0) {
+      filtered = filtered.filter(app => statusFilter.includes(app.status));
+    }
+
+    // Apply date range filter
+    if (dateRangeFilter !== 'all') {
+      const now = new Date();
+      const cutoffDate = new Date();
+      
+      switch (dateRangeFilter) {
+        case '7days':
+          cutoffDate.setDate(now.getDate() - 7);
+          break;
+        case '30days':
+          cutoffDate.setDate(now.getDate() - 30);
+          break;
+        case '90days':
+          cutoffDate.setDate(now.getDate() - 90);
+          break;
+      }
+
+      filtered = filtered.filter(app => {
+        const appDate = new Date(app.dateApplied);
+        return appDate >= cutoffDate;
+      });
+    }
+
+    // Apply sorting
+    if (sortField !== 'none') {
+      filtered.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortField) {
+          case 'company':
+            aValue = a.company.toLowerCase();
+            bValue = b.company.toLowerCase();
+            break;
+          case 'dateApplied':
+            aValue = new Date(a.dateApplied);
+            bValue = new Date(b.dateApplied);
+            break;
+          case 'lastUpdate':
+            aValue = new Date(a.lastUpdate);
+            bValue = new Date(b.lastUpdate);
+            break;
+          case 'status':
+            aValue = a.status;
+            bValue = b.status;
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  };
+
+  const filteredApplications = getFilteredAndSortedApplications();
+
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      // Toggle sort order
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleFilterStatus = (statuses: string[]) => {
+    setStatusFilter(statuses);
+  };
+
+  const handleFilterDateRange = (range: 'all' | '7days' | '30days' | '90days') => {
+    setDateRangeFilter(range);
+  };
+
+  const clearFilters = () => {
+    setStatusFilter([]);
+    setDateRangeFilter('all');
+    setSortField('none');
+  };
+
   return (
     <div className="flex flex-col h-full bg-background-light dark:bg-background-dark transition-colors duration-200">
       <Header toggleTheme={toggleTheme} isDark={isDark} onAddClick={() => setIsAddModalOpen(true)} />
@@ -95,8 +198,16 @@ const App: React.FC = () => {
         {/* List View */}
         <div className="flex-1 overflow-hidden">
             <ApplicationsTable 
-                applications={applications} 
+                applications={filteredApplications} 
                 onSelectApplication={handleSelectApplication}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                statusFilter={statusFilter}
+                dateRangeFilter={dateRangeFilter}
+                onFilterStatus={handleFilterStatus}
+                onFilterDateRange={handleFilterDateRange}
+                onClearFilters={clearFilters}
             />
         </div>
       </main>

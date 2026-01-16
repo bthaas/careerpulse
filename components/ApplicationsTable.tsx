@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Application, AppStatus } from '../types';
+import { SortField, SortOrder } from '../App';
 
 interface ApplicationsTableProps {
   applications: Application[];
   onSelectApplication: (app: Application) => void;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  onSort: (field: SortField) => void;
+  statusFilter: string[];
+  dateRangeFilter: 'all' | '7days' | '30days' | '90days';
+  onFilterStatus: (statuses: string[]) => void;
+  onFilterDateRange: (range: 'all' | '7days' | '30days' | '90days') => void;
+  onClearFilters: () => void;
 }
 
 const StatusPill: React.FC<{ status: AppStatus }> = ({ status }) => {
@@ -21,16 +30,169 @@ const StatusPill: React.FC<{ status: AppStatus }> = ({ status }) => {
   );
 };
 
-const ApplicationsTable: React.FC<ApplicationsTableProps> = ({ applications, onSelectApplication }) => {
+const ApplicationsTable: React.FC<ApplicationsTableProps> = ({ 
+  applications, 
+  onSelectApplication,
+  sortField,
+  sortOrder,
+  onSort,
+  statusFilter,
+  dateRangeFilter,
+  onFilterStatus,
+  onFilterDateRange,
+  onClearFilters
+}) => {
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
+
+  const toggleStatusFilter = (status: string) => {
+    if (statusFilter.includes(status)) {
+      onFilterStatus(statusFilter.filter(s => s !== status));
+    } else {
+      onFilterStatus([...statusFilter, status]);
+    }
+  };
+
+  const hasActiveFilters = statusFilter.length > 0 || dateRangeFilter !== 'all' || sortField !== 'none';
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full">
       <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Recent Applications</h2>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
-            <span className="material-symbols-outlined text-[18px]">filter_list</span>
-            Filter
-          </button>
+        <div className="flex gap-2 relative">
+          {/* Sort Button */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">sort</span>
+              Sort
+              {sortField !== 'none' && (
+                <span className="ml-1 px-1.5 py-0.5 bg-primary text-white text-xs rounded-full">1</span>
+              )}
+            </button>
+
+            {showSortMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10">
+                <div className="p-2">
+                  <button
+                    onClick={() => { onSort('company'); setShowSortMenu(false); }}
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors flex items-center justify-between"
+                  >
+                    <span>Company {sortField === 'company' && `(${sortOrder === 'asc' ? 'A-Z' : 'Z-A'})`}</span>
+                    {sortField === 'company' && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                  </button>
+                  <button
+                    onClick={() => { onSort('dateApplied'); setShowSortMenu(false); }}
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors flex items-center justify-between"
+                  >
+                    <span>Date Applied {sortField === 'dateApplied' && `(${sortOrder === 'asc' ? 'Oldest' : 'Newest'})`}</span>
+                    {sortField === 'dateApplied' && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                  </button>
+                  <button
+                    onClick={() => { onSort('lastUpdate'); setShowSortMenu(false); }}
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors flex items-center justify-between"
+                  >
+                    <span>Last Update {sortField === 'lastUpdate' && `(${sortOrder === 'asc' ? 'Oldest' : 'Newest'})`}</span>
+                    {sortField === 'lastUpdate' && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                  </button>
+                  <button
+                    onClick={() => { onSort('status'); setShowSortMenu(false); }}
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors flex items-center justify-between"
+                  >
+                    <span>Status {sortField === 'status' && `(${sortOrder === 'asc' ? 'A-Z' : 'Z-A'})`}</span>
+                    {sortField === 'status' && <span className="material-symbols-outlined text-primary text-[18px]">check</span>}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Filter Button */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">filter_list</span>
+              Filter
+              {hasActiveFilters && (
+                <span className="ml-1 px-1.5 py-0.5 bg-primary text-white text-xs rounded-full">
+                  {(statusFilter.length > 0 ? 1 : 0) + (dateRangeFilter !== 'all' ? 1 : 0)}
+                </span>
+              )}
+            </button>
+
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10">
+                <div className="p-4 space-y-4">
+                  {/* Status Filter */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+                      Status
+                    </label>
+                    <div className="space-y-2">
+                      {(['Applied', 'Interview', 'Offer', 'Rejected'] as const).map(status => (
+                        <label key={status} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={statusFilter.includes(status)}
+                            onChange={() => toggleStatusFilter(status)}
+                            className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm text-slate-700 dark:text-slate-300">{status}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Date Range Filter */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
+                      Date Range
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: 'all', label: 'All Time' },
+                        { value: '7days', label: 'Last 7 Days' },
+                        { value: '30days', label: 'Last 30 Days' },
+                        { value: '90days', label: 'Last 90 Days' },
+                      ].map(option => (
+                        <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="dateRange"
+                            checked={dateRangeFilter === option.value}
+                            onChange={() => onFilterDateRange(option.value as any)}
+                            className="border-slate-300 dark:border-slate-600 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm text-slate-700 dark:text-slate-300">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                    <button
+                      onClick={() => { onClearFilters(); setShowFilterMenu(false); }}
+                      className="flex-1 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      onClick={() => setShowFilterMenu(false)}
+                      className="flex-1 px-3 py-2 text-xs font-medium text-white bg-primary hover:bg-blue-600 rounded transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
             <span className="material-symbols-outlined text-[18px]">download</span>
             Export
