@@ -1,0 +1,5 @@
+{
+  "name": "CareerPulse",
+  "description": "A modern job application tracking dashboard featuring application stats, a detailed list view, and a slide-out drawer for managing application details and correspondence.",
+  "requestFramePermissions": []
+}
