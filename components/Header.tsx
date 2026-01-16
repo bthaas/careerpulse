@@ -4,9 +4,11 @@ interface HeaderProps {
   toggleTheme: () => void;
   isDark: boolean;
   onAddClick: () => void;
+  searchQuery: string;
+  onSearch: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,6 +29,8 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick }) => {
               </span>
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => onSearch(e.target.value)}
                 className="w-full h-10 pl-10 pr-4 text-sm text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-none rounded-full focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400 transition-shadow outline-none"
                 placeholder="Search applications, companies..."
               />

@@ -22,6 +22,7 @@ const App: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [dateRangeFilter, setDateRangeFilter] = useState<'all' | '7days' | '30days' | '90days'>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Initialize theme
   useEffect(() => {
@@ -97,6 +98,16 @@ const App: React.FC = () => {
   // Sort and filter applications
   const getFilteredAndSortedApplications = (): Application[] => {
     let filtered = [...applications];
+
+    // Apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(app => 
+        app.company.toLowerCase().includes(query) ||
+        app.role.toLowerCase().includes(query) ||
+        app.location.toLowerCase().includes(query)
+      );
+    }
 
     // Apply status filter
     if (statusFilter.length > 0) {
@@ -188,9 +199,19 @@ const App: React.FC = () => {
     setSortField('none');
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div className="flex flex-col h-full bg-background-light dark:bg-background-dark transition-colors duration-200">
-      <Header toggleTheme={toggleTheme} isDark={isDark} onAddClick={() => setIsAddModalOpen(true)} />
+      <Header 
+        toggleTheme={toggleTheme} 
+        isDark={isDark} 
+        onAddClick={() => setIsAddModalOpen(true)}
+        searchQuery={searchQuery}
+        onSearch={handleSearch}
+      />
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
         {/* Top Stats */}

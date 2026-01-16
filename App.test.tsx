@@ -3,6 +3,131 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
+describe('Phase 7: Functional Search', () => {
+  it('should have search input in header', () => {
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    expect(searchInput).toBeInTheDocument();
+  });
+
+  it('should filter applications by company name', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    
+    // Type in search
+    await user.type(searchInput, 'Acme');
+    
+    // Should show Acme Corp
+    expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+    
+    // Should not show other companies (they might still be in stats, so check table area)
+    const tableArea = document.querySelector('.overflow-x-auto');
+    expect(tableArea?.textContent).not.toContain('TechFlow');
+  });
+
+  it('should filter applications by job title', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    
+    // Type in search
+    await user.type(searchInput, 'Designer');
+    
+    // Should show role with Designer
+    expect(screen.getByText('Senior Designer')).toBeInTheDocument();
+  });
+
+  it('should filter applications by location', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    
+    // Type in search
+    await user.type(searchInput, 'Remote');
+    
+    // Should show applications with Remote location
+    expect(screen.getByText('TechFlow')).toBeInTheDocument();
+  });
+
+  it('should be case-insensitive', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    
+    // Type in lowercase
+    await user.type(searchInput, 'acme');
+    
+    // Should still find Acme Corp
+    expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+  });
+
+  it('should clear search when input is cleared', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/) as HTMLInputElement;
+    
+    // Type in search
+    await user.type(searchInput, 'Acme');
+    
+    // Clear search
+    await user.clear(searchInput);
+    
+    // Should show all companies again
+    expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+    expect(screen.getByText('TechFlow')).toBeInTheDocument();
+  });
+
+  it('should combine search with filters', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    // Apply search
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    await user.type(searchInput, 'Corp');
+    
+    // Apply filter
+    const filterButtons = screen.getAllByText('Filter');
+    await user.click(filterButtons[0]);
+    await user.click(screen.getByRole('checkbox', { name: /Interview/i }));
+    await user.click(screen.getByText('Apply'));
+    
+    // Should show only companies with "Corp" that are in Interview status
+    expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+  });
+
+  it('should update search value in real-time', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/) as HTMLInputElement;
+    
+    await user.type(searchInput, 'Test');
+    
+    expect(searchInput.value).toBe('Test');
+  });
+
+  it('should show no results when search matches nothing', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    const searchInput = screen.getByPlaceholderText(/Search applications, companies/);
+    
+    // Type something that doesn't match any application
+    await user.type(searchInput, 'NonExistentCompany12345');
+    
+    // Pagination should show 0 results
+    const paginationText = document.querySelector('.px-6.py-4.border-t')?.textContent;
+    expect(paginationText).toContain('0');
+  });
+});
+
 describe('Phase 6: Empty State', () => {
   it('should show empty state when no applications exist', () => {
     // Render with no initial data by mocking MOCK_APPLICATIONS
