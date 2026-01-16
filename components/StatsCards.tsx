@@ -1,6 +1,17 @@
 import React from 'react';
+import { Application } from '../types';
 
-const StatsCards: React.FC = () => {
+interface StatsCardsProps {
+  applications: Application[];
+}
+
+const StatsCards: React.FC<StatsCardsProps> = ({ applications }) => {
+  // Calculate stats dynamically
+  const totalApplications = applications.length;
+  const interviewCount = applications.filter(app => app.status === 'Interview').length;
+  const offerCount = applications.filter(app => app.status === 'Offer').length;
+  const rejectedCount = applications.filter(app => app.status === 'Rejected').length;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {/* Card 1 */}
@@ -12,10 +23,8 @@ const StatsCards: React.FC = () => {
           </div>
         </div>
         <div className="flex items-baseline gap-2">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">42</h3>
-          <span className="text-xs font-medium text-green-600 flex items-center">
-            <span className="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
-          </span>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{totalApplications}</h3>
+          <span className="text-xs font-medium text-slate-400">Total</span>
         </div>
       </div>
 
@@ -28,7 +37,7 @@ const StatsCards: React.FC = () => {
           </div>
         </div>
         <div className="flex items-baseline gap-2">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">8</h3>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{interviewCount}</h3>
           <span className="text-xs font-medium text-slate-400">Active</span>
         </div>
       </div>
@@ -42,7 +51,7 @@ const StatsCards: React.FC = () => {
           </div>
         </div>
         <div className="flex items-baseline gap-2">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">2</h3>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{offerCount}</h3>
           <span className="text-xs font-medium text-green-600">Pending response</span>
         </div>
       </div>
@@ -56,8 +65,8 @@ const StatsCards: React.FC = () => {
           </div>
         </div>
         <div className="flex items-baseline gap-2">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">12</h3>
-          <span className="text-xs font-medium text-slate-400">This month</span>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{rejectedCount}</h3>
+          <span className="text-xs font-medium text-slate-400">This period</span>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import ApplicationDrawer from './components/ApplicationDrawer';
 import { Application, MOCK_APPLICATIONS } from './types';
 
 const App: React.FC = () => {
+  const [applications, setApplications] = useState<Application[]>(MOCK_APPLICATIONS);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
@@ -40,27 +41,14 @@ const App: React.FC = () => {
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
         {/* Top Stats */}
-        <StatsCards />
+        <StatsCards applications={applications} />
 
         {/* List View */}
         <div className="flex-1 overflow-hidden">
             <ApplicationsTable 
-                applications={MOCK_APPLICATIONS.slice(0, 5)} 
+                applications={applications} 
                 onSelectApplication={handleSelectApplication}
             />
-            
-            {/* 
-               Pre-load the Google example from the screenshot for demo purposes 
-               if user clicks "Google" which isn't in the main list but is in mock data 
-             */}
-            <div className="mt-4 text-center">
-                 <button 
-                    className="text-xs text-slate-400 hover:text-primary underline"
-                    onClick={() => handleSelectApplication(MOCK_APPLICATIONS[5])}
-                >
-                    Show Google Example (Drawer Demo)
-                </button>
-            </div>
         </div>
       </main>
 
