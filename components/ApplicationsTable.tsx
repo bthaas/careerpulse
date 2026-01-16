@@ -41,12 +41,13 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({ applications, onS
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[25%]">Company</th>
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Role</th>
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Date Applied</th>
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Status</th>
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Source</th>
-              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[10%]"></th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Company</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[18%]">Role</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[12%]">Date Applied</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[12%]">Last Update</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[12%]">Status</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[14%]">Source</th>
+              <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[12%]"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -76,6 +77,9 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({ applications, onS
                   <p className="text-sm text-slate-500 dark:text-slate-400">{app.dateApplied}</p>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{app.lastUpdate}</p>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   <StatusPill status={app.status} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -97,11 +101,11 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({ applications, onS
       {/* Pagination */}
       <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between mt-auto">
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Showing <span className="font-medium text-slate-900 dark:text-white">1</span> to <span className="font-medium text-slate-900 dark:text-white">{applications.length}</span> of <span className="font-medium text-slate-900 dark:text-white">42</span> results
+          Showing <span className="font-medium text-slate-900 dark:text-white">1</span> to <span className="font-medium text-slate-900 dark:text-white">{applications.length}</span> of <span className="font-medium text-slate-900 dark:text-white">{applications.length}</span> results
         </p>
         <div className="flex gap-2">
           <button className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50" disabled>Previous</button>
-          <button className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">Next</button>
+          <button className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50" disabled>Next</button>
         </div>
       </div>
     </div>
