@@ -6,6 +6,7 @@ export interface Application {
   role: string;
   location: string;
   dateApplied: string;
+  lastUpdate: string;
   status: AppStatus;
   source: string;
   sourceIcon: string;
@@ -17,6 +18,7 @@ export interface Application {
   emailSubject?: string;
   emailBody?: string;
   notes?: string;
+  createdAt?: string;
 }
 
 export const MOCK_APPLICATIONS: Application[] = [
@@ -26,6 +28,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'Senior Designer',
     location: 'San Francisco, CA',
     dateApplied: 'Oct 24, 2023',
+    lastUpdate: 'Jan 14, 2026',
     status: 'Interview',
     source: 'LinkedIn',
     sourceIcon: 'link',
@@ -44,6 +47,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'Frontend Dev',
     location: 'Remote',
     dateApplied: 'Oct 22, 2023',
+    lastUpdate: 'Oct 22, 2023',
     status: 'Applied',
     source: 'Referrer',
     sourceIcon: 'person',
@@ -62,6 +66,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'Product Manager',
     location: 'New York, NY',
     dateApplied: 'Oct 20, 2023',
+    lastUpdate: 'Nov 5, 2023',
     status: 'Rejected',
     source: 'Indeed',
     sourceIcon: 'public',
@@ -80,6 +85,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'UX Researcher',
     location: 'Austin, TX',
     dateApplied: 'Oct 18, 2023',
+    lastUpdate: 'Oct 18, 2023',
     status: 'Applied',
     source: 'Glassdoor',
     sourceIcon: 'search',
@@ -98,6 +104,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'Data Scientist',
     location: 'Seattle, WA',
     dateApplied: 'Oct 15, 2023',
+    lastUpdate: 'Dec 10, 2023',
     status: 'Offer',
     source: 'Direct',
     sourceIcon: 'send',
@@ -116,6 +123,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     role: 'Software Engineer, Full Stack',
     location: 'Mountain View, CA',
     dateApplied: 'Oct 24, 2023',
+    lastUpdate: 'Jan 15, 2026',
     status: 'Applied', // Using Applied technically but "In Review" is a substatus in the UI
     source: 'LinkedIn',
     sourceIcon: 'work',
