@@ -4,6 +4,7 @@ import StatsCards from './components/StatsCards';
 import ApplicationsTable from './components/ApplicationsTable';
 import ApplicationDrawer from './components/ApplicationDrawer';
 import AddApplicationModal, { NewApplication } from './components/AddApplicationModal';
+import EmptyState from './components/EmptyState';
 import { Application, MOCK_APPLICATIONS } from './types';
 
 export type SortField = 'company' | 'dateApplied' | 'lastUpdate' | 'status' | 'none';
@@ -193,22 +194,29 @@ const App: React.FC = () => {
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
         {/* Top Stats */}
-        <StatsCards applications={applications} />
+        {applications.length > 0 && <StatsCards applications={applications} />}
 
-        {/* List View */}
+        {/* List View or Empty State */}
         <div className="flex-1 overflow-hidden">
-            <ApplicationsTable 
-                applications={filteredApplications} 
-                onSelectApplication={handleSelectApplication}
-                sortField={sortField}
-                sortOrder={sortOrder}
-                onSort={handleSort}
-                statusFilter={statusFilter}
-                dateRangeFilter={dateRangeFilter}
-                onFilterStatus={handleFilterStatus}
-                onFilterDateRange={handleFilterDateRange}
-                onClearFilters={clearFilters}
-            />
+            {applications.length === 0 ? (
+              <EmptyState 
+                onAddManually={() => setIsAddModalOpen(true)}
+                onConnectEmail={() => alert('Gmail connection coming soon!')}
+              />
+            ) : (
+              <ApplicationsTable 
+                  applications={filteredApplications} 
+                  onSelectApplication={handleSelectApplication}
+                  sortField={sortField}
+                  sortOrder={sortOrder}
+                  onSort={handleSort}
+                  statusFilter={statusFilter}
+                  dateRangeFilter={dateRangeFilter}
+                  onFilterStatus={handleFilterStatus}
+                  onFilterDateRange={handleFilterDateRange}
+                  onClearFilters={clearFilters}
+              />
+            )}
         </div>
       </main>
 
