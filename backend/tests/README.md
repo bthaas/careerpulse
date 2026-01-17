@@ -1,12 +1,13 @@
 # Email Scraping Validation Test Suite
 
-Comprehensive test suite for validating the JobFetch/CareerPulse email scraping functionality with **311+ passing tests**.
+Comprehensive test suite for validating the JobFetch/CareerPulse email scraping functionality with **389 passing tests**.
 
 ## 📊 Test Coverage
 
 - **Unit Tests**: 125+ tests for individual functions
-- **Property-Based Tests**: 45+ tests with 2,500+ randomized iterations  
-- **Total**: 311+ tests passing
+- **Property-Based Tests**: 45+ tests with 4,500+ randomized iterations  
+- **Integration Tests**: 25+ tests for API endpoints
+- **Total**: 389 tests passing
 
 ## 🚀 Running Tests
 
@@ -14,6 +15,7 @@ Comprehensive test suite for validating the JobFetch/CareerPulse email scraping 
 npm test                    # Run all tests
 npm run test:unit          # Unit tests only
 npm run test:properties    # Property-based tests only
+npm run test:integration   # Integration tests only
 npm run test:coverage      # With coverage report
 npm run test:watch         # Watch mode
 ```
@@ -24,6 +26,7 @@ npm run test:watch         # Watch mode
 tests/
 ├── unit/              # Unit tests (125+ tests)
 ├── properties/        # Property-based tests (45+ tests)
+├── integration/       # Integration tests (25+ tests)
 ├── helpers/           # Test utilities
 └── fixtures/          # Test data (68 emails)
 ```
