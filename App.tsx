@@ -32,10 +32,10 @@ const App: React.FC = () => {
     return <LoginSignup />;
   }
   
-  return <Dashboard logout={logout} />;
+  return <Dashboard logout={logout} user={user} />;
 };
 
-const Dashboard: React.FC<{ logout: () => void }> = ({ logout }) => {
+const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: string; name?: string } }> = ({ logout, user }) => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -290,6 +290,7 @@ const Dashboard: React.FC<{ logout: () => void }> = ({ logout }) => {
         onSyncEmails={handleSyncEmails}
         isSyncing={isSyncing}
         onLogout={logout}
+        user={user}
       />
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">

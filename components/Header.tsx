@@ -9,9 +9,12 @@ interface HeaderProps {
   onSyncEmails?: () => void;
   isSyncing?: boolean;
   onLogout?: () => void;
+  user?: { name?: string; email?: string };
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout, user }) => {
+  const [showUserMenu, setShowUserMenu] = React.useState(false);
+  
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,24 +87,59 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
                  <span className="material-symbols-outlined text-[20px]">{isDark ? 'light_mode' : 'dark_mode'}</span>
             </button>
 
-            {onLogout && (
-              <button 
-                onClick={onLogout}
-                className="flex items-center justify-center size-9 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                title="Logout"
-              >
-                <span className="material-symbols-outlined text-[20px]">logout</span>
-              </button>
-            )}
+            {/* User Menu */}
+            {onLogout && user && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 h-9 px-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <div className="size-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
+                    {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span className="hidden md:block text-sm font-medium max-w-[120px] truncate">
+                    {user.name || user.email?.split('@')[0]}
+                  </span>
+                  <span className="material-symbols-outlined text-[16px]">
+                    {showUserMenu ? 'expand_less' : 'expand_more'}
+                  </span>
+                </button>
 
-            <div className="relative group cursor-pointer">
-              <div 
-                className="size-9 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border-2 border-white dark:border-slate-800 shadow-sm"
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB042Z9FpnPxGIhZJWBtXrGUj1tdZgmRZ7O3M-mBGTrQ6bsrblgeAVl3Axq3dnMmQoVsO7d93YMalHh1mqWf3wkUFNtwVjVde-Tc0K2mig4LZQBm5ArILWPbPz3RuPd9Wolt2O2vv9ziIWHgKHZdo8udeAAj-aILI2cJAwTCG7NxdY_iN0YlDkhu1s7ILO_l48ehT5HNeVqnbrpzf7htpuhee0XvY2IIHx-6Briv1dLaXTD86dAT1Xo99MuomAjRsEUXbZaz0u7M_9N')" }}
-              >
+                {/* Dropdown Menu */}
+                {showUserMenu && (
+                  <>
+                    {/* Backdrop to close menu */}
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowUserMenu(false)}
+                    />
+                    
+                    {/* Menu */}
+                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                          {user.name || 'User'}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {user.email}
+                        </p>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          onLogout();
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                        <span className="font-medium">Sign Out</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="absolute bottom-0 right-0 size-2.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-900"></div>
-            </div>
+            )}
           </div>
         </div>
       </div>
