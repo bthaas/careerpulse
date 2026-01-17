@@ -56,14 +56,20 @@ async function accessSecret(secretName, version = 'latest') {
  * @returns {Promise<Object>} Object containing all secrets
  */
 export async function loadSecrets() {
-  console.log('🔐 Loading secrets from Google Cloud Secret Manager...');
+  console.log('🔐 Loading application secrets...');
   
   try {
-    // Check if we should use Secret Manager (production) or .env (local dev)
-    const useSecretManager = process.env.USE_SECRET_MANAGER === 'true' || process.env.NODE_ENV === 'production';
+    // Check if we should use Secret Manager or .env
+    // USE_SECRET_MANAGER=false explicitly disables Secret Manager (even in production)
+    let useSecretManager;
+    if (process.env.USE_SECRET_MANAGER === 'false') {
+      useSecretManager = false;
+    } else {
+      useSecretManager = process.env.USE_SECRET_MANAGER === 'true' || process.env.NODE_ENV === 'production';
+    }
     
     if (!useSecretManager) {
-      console.log('📝 Using local .env file (development mode)');
+      console.log('📝 Using environment variables (.env file)');
       return {
         JWT_SECRET: process.env.JWT_SECRET,
         SESSION_SECRET: process.env.SESSION_SECRET,
@@ -76,6 +82,7 @@ export async function loadSecrets() {
     }
     
     // Load secrets from Google Cloud Secret Manager
+    console.log('🔐 Loading secrets from Google Cloud Secret Manager...');
     // Note: Google OAuth secrets are optional
     let JWT_SECRET, SESSION_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET;
     
