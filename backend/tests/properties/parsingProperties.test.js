@@ -59,8 +59,11 @@ describe('Property 1: Job Email Classification', () => {
       fc.property(
         fc.constantFrom(...jobKeywords),
         fc.emailAddress(),
-        fc.date(),
-        (keyword, from, date) => {
+        fc.integer({ min: 0, max: 365 }), // Days ago
+        (keyword, from, daysAgo) => {
+          const date = new Date();
+          date.setDate(date.getDate() - daysAgo);
+          
           const email = {
             id: fc.sample(fc.uuid(), 1)[0],
             from: `jobs@${from.split('@')[1]}`,

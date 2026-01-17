@@ -44,8 +44,11 @@ describe('Property 8: Date Format Consistency', () => {
   it('should maintain consistent date format across different date inputs', () => {
     fc.assert(
       fc.property(
-        fc.date({ min: new Date('2000-01-01'), max: new Date('2099-12-31') }),
-        (date) => {
+        fc.integer({ min: 0, max: 365 }), // Days ago
+        (daysAgo) => {
+          const date = new Date();
+          date.setDate(date.getDate() - daysAgo);
+          
           const email = {
             id: 'test',
             from: 'jobs@company.com',

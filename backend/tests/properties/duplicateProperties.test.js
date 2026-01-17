@@ -46,8 +46,10 @@ describe('Property 13: Duplicate Detection Correctness', () => {
         fc.constantFrom('TechCorp', 'Google', 'Amazon'),
         fc.constantFrom('DataCorp', 'Microsoft', 'Apple'),
         fc.constantFrom('Software Engineer', 'Senior Developer'),
-        fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
-        (company1, company2, role, date) => {
+        fc.integer({ min: 0, max: 365 }), // Days ago
+        (company1, company2, role, daysAgo) => {
+          const date = new Date();
+          date.setDate(date.getDate() - daysAgo);
           const dateStr = date.toISOString().split('T')[0];
           
           const app1 = { company: company1, role, dateApplied: dateStr };

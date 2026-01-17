@@ -193,7 +193,7 @@ export function generateJobEmail(options = {}) {
 function generateEmailBody(status, keyword, company, role, location) {
   const companyName = company || 'our company';
   const roleName = role || 'the position';
-  const locationInfo = location ? `\nLocation: ${location}` : '';
+  const locationInfo = location ? `\nLocation: ${location}\n` : '\n';
   
   let body = '';
   
@@ -201,8 +201,8 @@ function generateEmailBody(status, keyword, company, role, location) {
     case 'Offer':
       body = `Dear Candidate,
 
-${keyword.charAt(0).toUpperCase() + keyword.slice(1)}! We are pleased to offer you the ${roleName} position at ${companyName}.${locationInfo}
-
+${keyword.charAt(0).toUpperCase() + keyword.slice(1)}! We are pleased to offer you the ${roleName} position at ${companyName}.
+${locationInfo}
 We believe you would be a great addition to our team. Please review the attached offer letter with details about compensation and benefits.
 
 Best regards,
@@ -213,7 +213,7 @@ ${companyName} Recruiting Team`;
       body = `Dear Candidate,
 
 Thank you for your interest in the ${roleName} position at ${companyName}.
-
+${locationInfo}
 ${keyword.charAt(0).toUpperCase() + keyword.slice(1)}, we have decided to move forward with other candidates whose qualifications more closely match our current needs.
 
 We appreciate the time you invested in the application process and wish you the best in your job search.
@@ -226,8 +226,8 @@ ${companyName} Recruiting Team`;
       body = `Dear Candidate,
 
 Thank you for your application to the ${roleName} position at ${companyName}.
-
-We would like to ${keyword} to discuss your qualifications and learn more about your experience.${locationInfo}
+${locationInfo}
+We would like to ${keyword} to discuss your qualifications and learn more about your experience.
 
 Please let us know your availability for next week.
 
@@ -239,8 +239,8 @@ ${companyName} Recruiting Team`;
     default:
       body = `Dear Candidate,
 
-${keyword.charAt(0).toUpperCase() + keyword.slice(1)} for the ${roleName} position at ${companyName}.${locationInfo}
-
+${keyword.charAt(0).toUpperCase() + keyword.slice(1)} for the ${roleName} position at ${companyName}.
+${locationInfo}
 We have received your application and our team will review it carefully. We will contact you if your qualifications match our requirements.
 
 Thank you for your interest in joining ${companyName}.
@@ -503,7 +503,7 @@ export function generateJobBoardEmail(options = {}) {
   const jobBoard = fc.sample(fc.constantFrom(...JOB_BOARD_DOMAINS), 1)[0];
   
   // Override the from address to use a job board domain
-  email.from = `noreply@${jobBoard}.com`;
+  email.from = `Recruiting Team <noreply@${jobBoard}.com>`;
   
   return email;
 }
