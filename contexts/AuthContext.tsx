@@ -22,17 +22,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load token from localStorage on mount
+  // Load token from localStorage on mount, or handle OAuth callback
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('user');
+    const handleAuthInit = async () => {
+      // Check for OAuth callback token in URL
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+      const error = params.get('error');
+      
+      if (error) {
+        console.error('OAuth error:', error);
+        const message = params.get('message');
+        if (message) {
+          console.error('OAuth error message:', message);
+        }
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setIsLoading(false);
+        return;
+      }
+      
+      if (urlToken) {
+        // Store token from OAuth callback
+        setToken(urlToken);
+        localStorage.setItem('auth_token', urlToken);
+        
+        // Fetch user data using the token
+        try {
+          const API_URL = import.meta.env.PROD 
+            ? 'https://api.jobfetch.app/api'
+            : 'http://localhost:3001/api';
+          
+          const response = await fetch(`${API_URL}/user/me`, {
+            headers: {
+              'Authorization': `Bearer ${urlToken}`,
+            },
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+          }
+        } catch (err) {
+          console.error('Failed to fetch user data:', err);
+        }
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Normal token check from localStorage
+      const storedToken = localStorage.getItem('auth_token');
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      }
+      
+      setIsLoading(false);
+    };
     
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    
-    setIsLoading(false);
+    handleAuthInit();
   }, []);
 
   const login = async (email: string, password: string) => {

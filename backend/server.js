@@ -50,12 +50,14 @@ app.get('/api/health', (req, res) => {
 // Import routes
 import applicationsRouter from './routes/applications.js';
 import authRouter from './routes/auth.js';
+import googleAuthRouter from './routes/googleAuth.js';
 import emailRouter from './routes/email.js';
 import userRouter from './routes/user.js';
 
 // Register routes
 app.use('/api/user', userRouter); // Public routes (signup/login)
 app.use('/api/auth', authRouter); // Gmail OAuth routes (protected)
+app.use('/api/auth', googleAuthRouter); // Google Sign-In OAuth (public callback)
 app.use('/api/applications', applicationsRouter); // Application routes (protected)
 app.use('/api/email', emailRouter); // Email sync routes (protected)
 
