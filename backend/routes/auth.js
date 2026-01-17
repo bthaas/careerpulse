@@ -10,6 +10,7 @@ import {
   disconnectEmail
 } from '../database/db.js';
 import { authMiddleware } from '../utils/auth.js';
+import { generateOAuthState, validateOAuthState } from '../utils/oauthState.js';
 
 const router = express.Router();
 
@@ -19,7 +20,14 @@ const router = express.Router();
  */
 router.get('/gmail', authMiddleware, (req, res) => {
   try {
-    const authUrl = getAuthUrl();
+    // Generate OAuth state with user context
+    const state = generateOAuthState(req.user.userId, req.user.email);
+    
+    console.log('🔐 Generating OAuth URL for user:', req.user.userId);
+    
+    // Generate OAuth URL with state parameter
+    const authUrl = getAuthUrl(state);
+    
     res.json({ authUrl });
   } catch (error) {
     console.error('Error generating auth URL:', error);
@@ -33,41 +41,121 @@ router.get('/gmail', authMiddleware, (req, res) => {
  */
 router.get('/gmail/callback', async (req, res) => {
   try {
-    const { code } = req.query;
+    const { code, state } = req.query;
+    
+    console.log('📧 OAuth callback received');
     
     if (!code) {
-      return res.status(400).send('Missing authorization code');
+      console.error('❌ Missing authorization code');
+      return res.status(400).send(`
+        <html>
+          <body>
+            <h1>❌ Connection Failed</h1>
+            <p>Missing authorization code</p>
+            <p>Please try again.</p>
+          </body>
+        </html>
+      `);
     }
+    
+    if (!state) {
+      console.error('❌ Missing state parameter');
+      return res.status(400).send(`
+        <html>
+          <body>
+            <h1>❌ Connection Failed</h1>
+            <p>Missing state parameter (security error)</p>
+            <p>Please try again.</p>
+          </body>
+        </html>
+      `);
+    }
+    
+    // Validate state parameter
+    const stateData = validateOAuthState(state);
+    
+    if (!stateData.valid) {
+      console.error('❌ Invalid state:', stateData.error);
+      return res.status(400).send(`
+        <html>
+          <body>
+            <h1>❌ Connection Failed</h1>
+            <p>Invalid or expired state parameter</p>
+            <p>Error: ${stateData.error}</p>
+            <p>Please try again.</p>
+          </body>
+        </html>
+      `);
+    }
+    
+    console.log('✅ State validated for user:', stateData.userId);
     
     // Exchange code for tokens
     const tokens = await getTokensFromCode(code);
     
     if (!tokens.access_token || !tokens.refresh_token) {
-      return res.status(400).send('Failed to obtain tokens');
+      console.error('❌ Failed to obtain tokens');
+      return res.status(400).send(`
+        <html>
+          <body>
+            <h1>❌ Connection Failed</h1>
+            <p>Failed to obtain access tokens</p>
+            <p>Please try again.</p>
+          </body>
+        </html>
+      `);
     }
+    
+    console.log('✅ Tokens obtained successfully');
     
     // Calculate token expiration
     const expiresAt = new Date(Date.now() + (tokens.expiry_date || 3600000));
     
-    // Note: This callback doesn't have access to user session
-    // In production, you'd need to store the userId in the OAuth state parameter
-    // For now, we'll extract from the session cookie if available
-    
-    // Save connection to database (temporary - will be updated with proper userId later)
+    // Save connection with ACTUAL userId (not 'pending')
     await saveEmailConnection({
-      userId: 'pending', // Will be updated when user logs in
-      email: tokens.email || 'unknown@email.com',
+      userId: stateData.userId, // ✅ FIXED: Use actual userId from state
+      email: tokens.email || stateData.email,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       expiresAt: expiresAt.toISOString()
     });
     
+    console.log('✅ Gmail connection saved for user:', stateData.userId);
+    
     // Redirect to frontend with success
     res.send(`
       <html>
+        <head>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              margin: 0;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .container {
+              background: white;
+              padding: 3rem;
+              border-radius: 1rem;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+              text-align: center;
+              max-width: 400px;
+            }
+            h1 { color: #10b981; margin: 0 0 1rem 0; font-size: 2rem; }
+            p { color: #6b7280; margin: 0.5rem 0; }
+            .icon { font-size: 4rem; margin-bottom: 1rem; }
+          </style>
+        </head>
         <body>
-          <h1>✅ Gmail Connected Successfully!</h1>
-          <p>You can now close this window and return to CareerPulse.</p>
+          <div class="container">
+            <div class="icon">✅</div>
+            <h1>Gmail Connected!</h1>
+            <p>Your Gmail account has been successfully connected.</p>
+            <p style="margin-top: 1.5rem; font-size: 0.875rem;">You can now close this window and return to CareerPulse.</p>
+          </div>
           <script>
             setTimeout(() => {
               window.close();
@@ -80,10 +168,39 @@ router.get('/gmail/callback', async (req, res) => {
     console.error('OAuth callback error:', error);
     res.status(500).send(`
       <html>
+        <head>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              margin: 0;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .container {
+              background: white;
+              padding: 3rem;
+              border-radius: 1rem;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+              text-align: center;
+              max-width: 400px;
+            }
+            h1 { color: #ef4444; margin: 0 0 1rem 0; font-size: 2rem; }
+            p { color: #6b7280; margin: 0.5rem 0; }
+            .icon { font-size: 4rem; margin-bottom: 1rem; }
+            .error { background: #fee; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; font-size: 0.875rem; color: #991b1b; }
+          </style>
+        </head>
         <body>
-          <h1>❌ Connection Failed</h1>
-          <p>Error: ${error.message}</p>
-          <p>Please try again.</p>
+          <div class="container">
+            <div class="icon">❌</div>
+            <h1>Connection Failed</h1>
+            <p>We couldn't connect your Gmail account.</p>
+            <div class="error">${error.message}</div>
+            <p style="margin-top: 1.5rem; font-size: 0.875rem;">Please close this window and try again.</p>
+          </div>
         </body>
       </html>
     `);
