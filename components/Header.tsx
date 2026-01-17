@@ -6,9 +6,11 @@ interface HeaderProps {
   onAddClick: () => void;
   searchQuery: string;
   onSearch: (query: string) => void;
+  onSyncEmails?: () => void;
+  isSyncing?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,9 +49,15 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
               <span>Add Application</span>
             </button>
 
-            <button className="hidden sm:flex items-center gap-2 h-9 px-4 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shadow-blue-500/20">
-              <span className="material-symbols-outlined text-[18px]">sync</span>
-              <span>Sync Gmail</span>
+            <button 
+              onClick={onSyncEmails}
+              disabled={isSyncing}
+              className="hidden sm:flex items-center gap-2 h-9 px-4 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className={`material-symbols-outlined text-[18px] ${isSyncing ? 'animate-spin' : ''}`}>
+                {isSyncing ? 'progress_activity' : 'sync'}
+              </span>
+              <span>{isSyncing ? 'Syncing...' : 'Sync Gmail'}</span>
             </button>
             
             {/* Mobile Add Icon */}
@@ -61,8 +69,14 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
             </button>
 
             {/* Mobile Sync Icon */}
-            <button className="sm:hidden flex items-center justify-center size-9 bg-primary text-white rounded-lg">
-              <span className="material-symbols-outlined text-[20px]">sync</span>
+            <button 
+              onClick={onSyncEmails}
+              disabled={isSyncing}
+              className="sm:hidden flex items-center justify-center size-9 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className={`material-symbols-outlined text-[20px] ${isSyncing ? 'animate-spin' : ''}`}>
+                {isSyncing ? 'progress_activity' : 'sync'}
+              </span>
             </button>
 
             <button onClick={toggleTheme} className="flex items-center justify-center size-9 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">

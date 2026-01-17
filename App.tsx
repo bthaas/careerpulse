@@ -5,17 +5,21 @@ import ApplicationsTable from './components/ApplicationsTable';
 import ApplicationDrawer from './components/ApplicationDrawer';
 import AddApplicationModal, { NewApplication } from './components/AddApplicationModal';
 import EmptyState from './components/EmptyState';
-import { Application, MOCK_APPLICATIONS } from './types';
+import { Application } from './types';
+import * as api from './services/api';
 
 export type SortField = 'company' | 'dateApplied' | 'lastUpdate' | 'status' | 'none';
 export type SortOrder = 'asc' | 'desc';
 
 const App: React.FC = () => {
-  const [applications, setApplications] = useState<Application[]>(MOCK_APPLICATIONS);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   
   // Sort & Filter state
   const [sortField, setSortField] = useState<SortField>('none');
@@ -33,6 +37,25 @@ const App: React.FC = () => {
     }
   }, [isDark]);
 
+  // Fetch applications on mount
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await api.getAllApplications();
+      setApplications(data);
+    } catch (err) {
+      console.error('Error fetching applications:', err);
+      setError('Failed to load applications. Make sure the backend server is running.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const toggleTheme = () => setIsDark(!isDark);
 
   const handleSelectApplication = (app: Application) => {
@@ -48,29 +71,58 @@ const App: React.FC = () => {
     }, 300);
   };
 
-  const handleAddApplication = (newApp: NewApplication) => {
-    const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    
-    const application: Application = {
-      id: Date.now().toString(),
-      company: newApp.company,
-      role: newApp.role,
-      location: newApp.location,
-      dateApplied: newApp.dateApplied,
-      lastUpdate: now,
-      status: newApp.status,
-      source: newApp.source,
-      sourceIcon: getSourceIcon(newApp.source),
-      logoUrl: '',
-      logoBgColor: getRandomBgColor(),
-      logoTextColor: getRandomTextColor(),
-      salary: newApp.salary,
-      remotePolicy: newApp.remotePolicy,
-      notes: newApp.notes,
-      createdAt: now,
-    };
+  const handleAddApplication = async (newApp: NewApplication) => {
+    try {
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      
+      const application = {
+        id: `app-${Date.now()}`,
+        company: newApp.company,
+        role: newApp.role,
+        location: newApp.location,
+        dateApplied: newApp.dateApplied,
+        lastUpdate: dateStr,
+        createdAt: now.toISOString(),
+        status: newApp.status,
+        source: newApp.source || 'Manual',
+        salary: newApp.salary,
+        remotePolicy: newApp.remotePolicy,
+        notes: newApp.notes,
+      };
 
-    setApplications(prev => [application, ...prev]);
+      // Create application via API
+      const created = await api.createApplication(application);
+      
+      // Add to local state
+      setApplications(prev => [created, ...prev]);
+    } catch (err) {
+      console.error('Error adding application:', err);
+      alert('Failed to add application. Please try again.');
+    }
+  };
+
+  const handleSyncEmails = async () => {
+    try {
+      setIsSyncing(true);
+      const result = await api.syncEmails({ maxResults: 100 });
+      
+      // Refresh applications list
+      await fetchApplications();
+      
+      alert(`✅ Sync complete!\n\nFound ${result.totalEmails} emails\nExtracted ${result.jobEmails} job-related emails\nAdded ${result.newApplications} new applications\nSkipped ${result.duplicates} duplicates`);
+    } catch (err: any) {
+      console.error('Error syncing emails:', err);
+      
+      if (err.message.includes('Gmail not connected')) {
+        // Show connect Gmail prompt
+        alert('Please connect your Gmail account first to sync emails.');
+      } else {
+        alert(`Failed to sync emails: ${err.message}`);
+      }
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const getSourceIcon = (source: string): string => {
@@ -211,6 +263,8 @@ const App: React.FC = () => {
         onAddClick={() => setIsAddModalOpen(true)}
         searchQuery={searchQuery}
         onSearch={handleSearch}
+        onSyncEmails={handleSyncEmails}
+        isSyncing={isSyncing}
       />
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
