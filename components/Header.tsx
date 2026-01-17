@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
             <div className="flex items-center justify-center size-9 bg-primary/10 rounded-lg text-primary">
               <span className="material-symbols-outlined text-2xl">work</span>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">CareerPulse</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">JobFetch</h1>
           </div>
 
           {/* Search Bar */}
