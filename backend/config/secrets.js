@@ -69,17 +69,30 @@ export async function loadSecrets() {
     }
     
     // Load secrets from Google Cloud Secret Manager
-    const [
-      JWT_SECRET,
-      SESSION_SECRET,
-      GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET,
-    ] = await Promise.all([
-      accessSecret('JWT_SECRET'),
-      accessSecret('SESSION_SECRET'),
-      accessSecret('GOOGLE_CLIENT_ID'),
-      accessSecret('GOOGLE_CLIENT_SECRET'),
-    ]);
+    // Note: Google OAuth secrets are optional
+    let JWT_SECRET, SESSION_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET;
+    
+    try {
+      [JWT_SECRET, SESSION_SECRET] = await Promise.all([
+        accessSecret('JWT_SECRET'),
+        accessSecret('SESSION_SECRET'),
+      ]);
+      
+      // Try to load Google OAuth secrets (optional)
+      try {
+        [GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET] = await Promise.all([
+          accessSecret('GOOGLE_CLIENT_ID'),
+          accessSecret('GOOGLE_CLIENT_SECRET'),
+        ]);
+      } catch (error) {
+        console.log('⚠️  Google OAuth secrets not found in Secret Manager, using environment variables');
+        GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || undefined;
+        GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || undefined;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load required secrets from Google Cloud:', error.message);
+      throw new Error('Failed to load JWT_SECRET and SESSION_SECRET from Secret Manager. Set USE_SECRET_MANAGER=false to use environment variables instead.');
+    }
     
     // Non-secret config from environment variables
     const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
