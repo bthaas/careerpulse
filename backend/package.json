@@ -9,15 +9,22 @@
     "dev": "node --watch server.js",
     "test": "node --test"
   },
-  "keywords": ["job-tracker", "gmail", "api"],
+  "keywords": [
+    "job-tracker",
+    "gmail",
+    "api"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "sqlite3": "^5.1.7",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "googleapis": "^128.0.0",
-    "express-session": "^1.17.3"
+    "jsonwebtoken": "^9.0.3",
+    "sqlite3": "^5.1.7"
   }
 }

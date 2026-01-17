@@ -1,5 +1,16 @@
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Applications table
 CREATE TABLE IF NOT EXISTS applications (
+  userId TEXT NOT NULL,
   id TEXT PRIMARY KEY,
   company TEXT NOT NULL,
   role TEXT NOT NULL,
@@ -16,7 +27,8 @@ CREATE TABLE IF NOT EXISTS applications (
   confidenceScore INTEGER DEFAULT 0,
   isDuplicate INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Email connections table
@@ -43,6 +55,8 @@ CREATE TABLE IF NOT EXISTS status_history (
 );
 
 -- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_applications_userId ON applications(userId);
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
 CREATE INDEX IF NOT EXISTS idx_applications_dateApplied ON applications(dateApplied);
 CREATE INDEX IF NOT EXISTS idx_applications_company ON applications(company);

@@ -47,10 +47,10 @@ function normalizeDate(dateStr) {
  * Returns { isDuplicate: boolean, duplicateId: string|null, similarity: number }
  */
 export async function checkDuplicate(application) {
-  const { company, role, dateApplied } = application;
+  const { userId, company, role, dateApplied } = application;
   
   // First, check exact match in database
-  const exactMatch = await findDuplicateApplication(company, role, dateApplied);
+  const exactMatch = await findDuplicateApplication(userId, company, role, dateApplied);
   
   if (exactMatch) {
     return {

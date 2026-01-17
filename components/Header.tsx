@@ -8,9 +8,10 @@ interface HeaderProps {
   onSearch: (query: string) => void;
   onSyncEmails?: () => void;
   isSyncing?: boolean;
+  onLogout?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,6 +83,16 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
             <button onClick={toggleTheme} className="flex items-center justify-center size-9 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                  <span className="material-symbols-outlined text-[20px]">{isDark ? 'light_mode' : 'dark_mode'}</span>
             </button>
+
+            {onLogout && (
+              <button 
+                onClick={onLogout}
+                className="flex items-center justify-center size-9 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                title="Logout"
+              >
+                <span className="material-symbols-outlined text-[20px]">logout</span>
+              </button>
+            )}
 
             <div className="relative group cursor-pointer">
               <div 

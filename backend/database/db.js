@@ -36,20 +36,21 @@ export async function initializeDatabase() {
 }
 
 /**
- * Get all applications
+ * Get all applications for a user
  */
-export async function getAllApplications() {
+export async function getAllApplications(userId) {
   return await dbAll(`
     SELECT * FROM applications 
+    WHERE userId = ?
     ORDER BY dateApplied DESC
-  `);
+  `, [userId]);
 }
 
 /**
- * Get application by ID
+ * Get application by ID (user-specific)
  */
-export async function getApplicationById(id) {
-  return await dbGet('SELECT * FROM applications WHERE id = ?', [id]);
+export async function getApplicationById(id, userId) {
+  return await dbGet('SELECT * FROM applications WHERE id = ? AND userId = ?', [id, userId]);
 }
 
 /**
@@ -58,11 +59,11 @@ export async function getApplicationById(id) {
 export async function createApplication(application) {
   const result = await dbRun(`
     INSERT INTO applications (
-      id, company, role, location, dateApplied, lastUpdate, createdAt,
+      id, userId, company, role, location, dateApplied, lastUpdate, createdAt,
       status, source, salary, remotePolicy, notes, emailId, confidenceScore, isDuplicate
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
-    application.id, application.company, application.role, application.location,
+    application.id, application.userId, application.company, application.role, application.location,
     application.dateApplied, application.lastUpdate, application.createdAt,
     application.status, application.source, application.salary, application.remotePolicy,
     application.notes, application.emailId, application.confidenceScore, application.isDuplicate
@@ -77,27 +78,27 @@ export async function createApplication(application) {
 }
 
 /**
- * Update an application
+ * Update an application (user-specific)
  */
-export async function updateApplication(id, updates) {
+export async function updateApplication(id, userId, updates) {
   const fields = Object.keys(updates)
-    .filter(key => key !== 'id')
+    .filter(key => key !== 'id' && key !== 'userId')
     .map(key => `${key} = ?`)
     .join(', ');
   
   const values = Object.keys(updates)
-    .filter(key => key !== 'id')
+    .filter(key => key !== 'id' && key !== 'userId')
     .map(key => updates[key]);
   
   const result = await dbRun(`
     UPDATE applications 
     SET ${fields}, updated_at = CURRENT_TIMESTAMP 
-    WHERE id = ?
-  `, [...values, id]);
+    WHERE id = ? AND userId = ?
+  `, [...values, id, userId]);
   
   // If status changed, add to history
   if (updates.status) {
-    const oldApp = await getApplicationById(id);
+    const oldApp = await getApplicationById(id, userId);
     if (oldApp && oldApp.status !== updates.status) {
       await addStatusHistory(id, oldApp.status, updates.status);
     }
@@ -107,10 +108,10 @@ export async function updateApplication(id, updates) {
 }
 
 /**
- * Delete an application
+ * Delete an application (user-specific)
  */
-export async function deleteApplication(id) {
-  return await dbRun('DELETE FROM applications WHERE id = ?', [id]);
+export async function deleteApplication(id, userId) {
+  return await dbRun('DELETE FROM applications WHERE id = ? AND userId = ?', [id, userId]);
 }
 
 /**
@@ -158,26 +159,54 @@ export async function saveEmailConnection(connection) {
 /**
  * Get email connection
  */
-export async function getEmailConnection(userId = 'default_user') {
+export async function getEmailConnection(userId) {
   return await dbGet('SELECT * FROM email_connections WHERE userId = ? AND connected = 1', [userId]);
 }
 
 /**
  * Disconnect email
  */
-export async function disconnectEmail(userId = 'default_user') {
+export async function disconnectEmail(userId) {
   return await dbRun('UPDATE email_connections SET connected = 0 WHERE userId = ?', [userId]);
 }
 
 /**
- * Check for duplicate applications
+ * Check for duplicate applications (user-specific)
  */
-export async function findDuplicateApplication(company, role, dateApplied) {
+export async function findDuplicateApplication(userId, company, role, dateApplied) {
   return await dbGet(`
     SELECT * FROM applications 
-    WHERE company = ? AND role = ? AND dateApplied = ?
+    WHERE userId = ? AND company = ? AND role = ? AND dateApplied = ?
     LIMIT 1
-  `, [company, role, dateApplied]);
+  `, [userId, company, role, dateApplied]);
+}
+
+/**
+ * User management functions
+ */
+
+/**
+ * Create a new user
+ */
+export async function createUser(user) {
+  return await dbRun(`
+    INSERT INTO users (id, email, password, name)
+    VALUES (?, ?, ?, ?)
+  `, [user.id, user.email, user.password, user.name]);
+}
+
+/**
+ * Get user by email
+ */
+export async function getUserByEmail(email) {
+  return await dbGet('SELECT * FROM users WHERE email = ?', [email]);
+}
+
+/**
+ * Get user by ID
+ */
+export async function getUserById(id) {
+  return await dbGet('SELECT * FROM users WHERE id = ?', [id]);
 }
 
 /**

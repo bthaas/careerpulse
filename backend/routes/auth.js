@@ -9,14 +9,15 @@ import {
   getEmailConnection,
   disconnectEmail
 } from '../database/db.js';
+import { authMiddleware } from '../utils/auth.js';
 
 const router = express.Router();
 
 /**
  * GET /api/auth/gmail
- * Initiate Gmail OAuth flow
+ * Initiate Gmail OAuth flow (protected route)
  */
-router.get('/gmail', (req, res) => {
+router.get('/gmail', authMiddleware, (req, res) => {
   try {
     const authUrl = getAuthUrl();
     res.json({ authUrl });
@@ -48,10 +49,14 @@ router.get('/gmail/callback', async (req, res) => {
     // Calculate token expiration
     const expiresAt = new Date(Date.now() + (tokens.expiry_date || 3600000));
     
-    // Save connection to database
+    // Note: This callback doesn't have access to user session
+    // In production, you'd need to store the userId in the OAuth state parameter
+    // For now, we'll extract from the session cookie if available
+    
+    // Save connection to database (temporary - will be updated with proper userId later)
     await saveEmailConnection({
-      userId: 'default_user',
-      email: tokens.email || 'unknown@email.com', // Will be updated when we fetch user info
+      userId: 'pending', // Will be updated when user logs in
+      email: tokens.email || 'unknown@email.com',
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       expiresAt: expiresAt.toISOString()
@@ -87,11 +92,11 @@ router.get('/gmail/callback', async (req, res) => {
 
 /**
  * GET /api/auth/status
- * Check if email is connected
+ * Check if email is connected (protected route)
  */
-router.get('/status', async (req, res) => {
+router.get('/status', authMiddleware, async (req, res) => {
   try {
-    const connection = await getEmailConnection();
+    const connection = await getEmailConnection(req.user.userId);
     
     if (!connection) {
       return res.json({ 
@@ -147,11 +152,11 @@ router.get('/status', async (req, res) => {
 
 /**
  * POST /api/auth/disconnect
- * Disconnect email connection
+ * Disconnect email connection (protected route)
  */
-router.post('/disconnect', async (req, res) => {
+router.post('/disconnect', authMiddleware, async (req, res) => {
   try {
-    await disconnectEmail();
+    await disconnectEmail(req.user.userId);
     
     res.json({ 
       success: true,
@@ -165,11 +170,11 @@ router.post('/disconnect', async (req, res) => {
 
 /**
  * POST /api/auth/refresh
- * Manually refresh access token
+ * Manually refresh access token (protected route)
  */
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', authMiddleware, async (req, res) => {
   try {
-    const connection = await getEmailConnection();
+    const connection = await getEmailConnection(req.user.userId);
     
     if (!connection || !connection.refreshToken) {
       return res.status(400).json({ error: 'No active connection found' });

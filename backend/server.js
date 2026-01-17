@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 // Load environment variables
 dotenv.config();
@@ -11,16 +12,19 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite dev server
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL 
+    : 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to true in production with HTTPS
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
@@ -39,11 +43,13 @@ app.get('/api/health', (req, res) => {
 import applicationsRouter from './routes/applications.js';
 import authRouter from './routes/auth.js';
 import emailRouter from './routes/email.js';
+import userRouter from './routes/user.js';
 
 // Register routes
-app.use('/api/applications', applicationsRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/email', emailRouter);
+app.use('/api/user', userRouter); // Public routes (signup/login)
+app.use('/api/auth', authRouter); // Gmail OAuth routes (protected)
+app.use('/api/applications', applicationsRouter); // Application routes (protected)
+app.use('/api/email', emailRouter); // Email sync routes (protected)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

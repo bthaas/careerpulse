@@ -7,8 +7,12 @@ import {
   deleteApplication,
   getStatusHistory 
 } from '../database/db.js';
+import { authMiddleware } from '../utils/auth.js';
 
 const router = express.Router();
+
+// Protect all routes with authentication
+router.use(authMiddleware);
 
 /**
  * GET /api/applications
@@ -16,7 +20,7 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const applications = await getAllApplications();
+    const applications = await getAllApplications(req.user.userId);
     res.json(applications);
   } catch (error) {
     console.error('Error fetching applications:', error);
@@ -45,7 +49,7 @@ router.get('/:id/history', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const application = await getApplicationById(req.params.id);
+    const application = await getApplicationById(req.params.id, req.user.userId);
     
     if (!application) {
       return res.status(404).json({ error: 'Application not found' });
@@ -79,6 +83,7 @@ router.post('/', async (req, res) => {
     
     const application = {
       id,
+      userId: req.user.userId, // Add userId from authenticated user
       company,
       role,
       location,
@@ -98,7 +103,7 @@ router.post('/', async (req, res) => {
     await createApplication(application);
     
     // Return the created application
-    const created = await getApplicationById(id);
+    const created = await getApplicationById(id, req.user.userId);
     res.status(201).json(created);
   } catch (error) {
     console.error('Error creating application:', error);
@@ -120,8 +125,8 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     
-    // Check if application exists
-    const existing = await getApplicationById(id);
+    // Check if application exists and belongs to user
+    const existing = await getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
@@ -137,10 +142,10 @@ router.put('/:id', async (req, res) => {
     // Update lastUpdate timestamp
     updates.lastUpdate = new Date().toISOString().split('T')[0];
     
-    await updateApplication(id, updates);
+    await updateApplication(id, req.user.userId, updates);
     
     // Return updated application
-    const updated = await getApplicationById(id);
+    const updated = await getApplicationById(id, req.user.userId);
     res.json(updated);
   } catch (error) {
     console.error('Error updating application:', error);
@@ -167,20 +172,20 @@ router.patch('/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Invalid status value' });
     }
     
-    // Check if application exists
-    const existing = await getApplicationById(id);
+    // Check if application exists and belongs to user
+    const existing = await getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
     
     // Update status and lastUpdate
-    await updateApplication(id, { 
+    await updateApplication(id, req.user.userId, { 
       status, 
       lastUpdate: new Date().toISOString().split('T')[0] 
     });
     
     // Return updated application
-    const updated = await getApplicationById(id);
+    const updated = await getApplicationById(id, req.user.userId);
     res.json(updated);
   } catch (error) {
     console.error('Error updating application status:', error);
@@ -196,13 +201,13 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Check if application exists
-    const existing = await getApplicationById(id);
+    // Check if application exists and belongs to user
+    const existing = await getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
     
-    await deleteApplication(id);
+    await deleteApplication(id, req.user.userId);
     
     res.status(204).send();
   } catch (error) {

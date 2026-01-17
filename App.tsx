@@ -5,13 +5,37 @@ import ApplicationsTable from './components/ApplicationsTable';
 import ApplicationDrawer from './components/ApplicationDrawer';
 import AddApplicationModal, { NewApplication } from './components/AddApplicationModal';
 import EmptyState from './components/EmptyState';
+import LoginSignup from './components/LoginSignup';
 import { Application } from './types';
 import * as api from './services/api';
+import { useAuth } from './contexts/AuthContext';
 
 export type SortField = 'company' | 'dateApplied' | 'lastUpdate' | 'status' | 'none';
 export type SortOrder = 'asc' | 'desc';
 
 const App: React.FC = () => {
+  const { user, logout, isLoading: authLoading } = useAuth();
+  
+  // Show login screen if not authenticated
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <LoginSignup />;
+  }
+  
+  return <Dashboard logout={logout} />;
+};
+
+const Dashboard: React.FC<{ logout: () => void }> = ({ logout }) => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -265,6 +289,7 @@ const App: React.FC = () => {
         onSearch={handleSearch}
         onSyncEmails={handleSyncEmails}
         isSyncing={isSyncing}
+        onLogout={logout}
       />
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">

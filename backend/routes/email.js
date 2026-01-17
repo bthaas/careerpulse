@@ -3,8 +3,12 @@ import { fetchJobEmails, getGmailProfile } from '../services/gmailService.js';
 import { parseEmail } from '../services/emailParser.js';
 import { checkDuplicate } from '../services/duplicateDetector.js';
 import { createApplication } from '../database/db.js';
+import { authMiddleware } from '../utils/auth.js';
 
 const router = express.Router();
+
+// Protect all routes with authentication
+router.use(authMiddleware);
 
 /**
  * POST /api/email/sync
@@ -41,6 +45,9 @@ router.post('/sync', async (req, res) => {
         }
         
         results.jobEmails++;
+        
+        // Add userId to application
+        application.userId = req.user.userId;
         
         // Check for duplicates
         const duplicateCheck = await checkDuplicate(application);
