@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 import { loadSecrets } from './config/secrets.js';
 
 // Load environment variables
@@ -14,23 +17,101 @@ let secrets = {};
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// ====================
+// Security Middleware
+// ====================
+
+// 1. Helmet - Security Headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow embedding for OAuth
+}));
+
+// 2. Request Logging (Morgan)
+if (process.env.NODE_ENV === 'production') {
+  // Production: Log only errors
+  app.use(morgan('combined', {
+    skip: (req, res) => res.statusCode < 400
+  }));
+} else {
+  // Development: Log all requests
+  app.use(morgan('dev'));
+}
+
+// 3. Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+  legacyHeaders: false, // Disable `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all API routes
+app.use('/api/', limiter);
+
+// Stricter rate limit for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: 'Too many login attempts, please try again later.',
+  skipSuccessfulRequests: true, // Don't count successful requests
+});
+
+app.use('/api/user/login', authLimiter);
+app.use('/api/user/signup', authLimiter);
+
+// ====================
+// CORS Configuration
+// ====================
+
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? ['https://jobfetch.app', 'https://www.jobfetch.app']
   : ['http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps, Postman, curl)
+    // But only in development
+    if (!origin && process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // In production, require origin header
+    if (!origin && process.env.NODE_ENV === 'production') {
+      return callback(new Error('Not allowed by CORS - Origin header required'));
+    }
+    
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(express.json());
+
+// ====================
+// Body Parsing & Cookies
+// ====================
+
+app.use(express.json({ limit: '10mb' })); // Limit request body size
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+
+// ====================
+// Session Configuration
+// ====================
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
@@ -38,7 +119,8 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
   }
 }));
 
