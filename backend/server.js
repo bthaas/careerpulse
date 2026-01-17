@@ -3,9 +3,13 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
+import { loadSecrets } from './config/secrets.js';
 
 // Load environment variables
 dotenv.config();
+
+// Global secrets storage
+let secrets = {};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -75,11 +79,36 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 JobFetch backend running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start server with secrets
+async function startServer() {
+  try {
+    // Load secrets from Google Cloud Secret Manager or .env
+    console.log('🔐 Loading application secrets...');
+    secrets = await loadSecrets();
+    
+    // Make secrets available globally
+    global.appSecrets = secrets;
+    
+    // Update process.env with loaded secrets (for backward compatibility)
+    Object.assign(process.env, secrets);
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 JobFetch backend running on http://localhost:${PORT}`);
+      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔐 Secrets loaded from: ${process.env.USE_SECRET_MANAGER === 'true' ? 'Google Cloud' : '.env file'}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Export secrets getter for other modules
+export function getSecrets() {
+  return global.appSecrets || {};
+}
+
+startServer();
 
 export default app;
