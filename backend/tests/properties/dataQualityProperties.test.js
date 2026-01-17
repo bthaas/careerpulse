@@ -19,6 +19,9 @@ describe('Property 8: Date Format Consistency', () => {
         fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
         fc.emailAddress(),
         (date, from) => {
+          // Skip invalid dates
+          if (isNaN(date.getTime())) return;
+          
           const email = {
             id: fc.sample(fc.uuid(), 1)[0],
             from: `jobs@${from.split('@')[1]}`,
