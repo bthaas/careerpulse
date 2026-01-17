@@ -155,7 +155,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
       const response = await fetch(`${api.API_URL}/api/auth/gmail`, {
         credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
       });
       
@@ -183,7 +183,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
           const statusResponse = await fetch(`${api.API_URL}/api/auth/status`, {
             credentials: 'include',
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
             }
           });
           
