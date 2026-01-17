@@ -9,7 +9,14 @@ import dotenv from 'dotenv';
 // Load .env for local development fallback
 dotenv.config();
 
-const client = new SecretManagerServiceClient();
+// Lazy-load client only when needed (to avoid crashes when not using Secret Manager)
+let client = null;
+function getClient() {
+  if (!client) {
+    client = new SecretManagerServiceClient();
+  }
+  return client;
+}
 
 // Get Google Cloud Project ID
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT_ID || process.env.GCP_PROJECT;
@@ -26,7 +33,7 @@ async function accessSecret(secretName, version = 'latest') {
     const name = `projects/${PROJECT_ID}/secrets/${secretName}/versions/${version}`;
     
     // Access the secret
-    const [secretVersion] = await client.accessSecretVersion({ name });
+    const [secretVersion] = await getClient().accessSecretVersion({ name });
     const payload = secretVersion.payload.data.toString('utf8');
     
     return payload;
@@ -126,7 +133,7 @@ export async function createSecret(secretName, secretValue) {
     
     // Create the secret
     try {
-      await client.createSecret({
+      await getClient().createSecret({
         parent,
         secretId: secretName,
         secret: {
@@ -144,7 +151,7 @@ export async function createSecret(secretName, secretValue) {
     
     // Add secret version
     const secretPath = `projects/${PROJECT_ID}/secrets/${secretName}`;
-    await client.addSecretVersion({
+    await getClient().addSecretVersion({
       parent: secretPath,
       payload: {
         data: Buffer.from(secretValue, 'utf8'),
