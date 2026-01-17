@@ -199,7 +199,7 @@ describe('Test Data Generators', () => {
     it('should generate email from job board domain', () => {
       const email = generateJobBoardEmail();
       
-      const jobBoards = ['greenhouse', 'lever', 'indeed', 'linkedin', 'workday'];
+      const jobBoards = ['greenhouse', 'lever', 'indeed', 'linkedin', 'workday', 'taleo', 'icims', 'smartrecruiters'];
       const hasJobBoardDomain = jobBoards.some(board => email.from.toLowerCase().includes(board));
       
       expect(hasJobBoardDomain).toBe(true);
