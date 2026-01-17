@@ -1,9 +1,11 @@
-# CareerPulse Setup Guide
+# JobFetch Setup Guide
 
 A full-stack job application tracker with automatic email sync powered by Gmail API.
 
 ## 🎯 Features
 
+- ✅ **Google Sign-In**: Quick authentication with your Google account
+- ✅ **Multi-User Support**: Each user has their own secure account
 - ✅ **Automatic Email Tracking**: Sync job application emails from Gmail
 - ✅ **Smart Parsing**: Extract company, role, status from emails using keyword detection
 - ✅ **Manual Entry**: Add applications manually with full details
@@ -53,14 +55,16 @@ cd ..
 3. Configure OAuth consent screen if prompted:
    - User Type: External
    - Add your email as test user
-   - Scopes: Add `gmail.readonly` and `userinfo.email`
+   - Scopes: Add `gmail.readonly`, `userinfo.email`, and `userinfo.profile`
 4. Create OAuth Client ID:
    - Application type: **Web application**
-   - Name: CareerPulse
-   - Authorized redirect URIs:
+   - Name: JobFetch
+   - Authorized redirect URIs (add both):
      ```
      http://localhost:3001/api/auth/gmail/callback
+     http://localhost:3001/api/auth/google/callback
      ```
+     > **Note**: The first is for Gmail sync, the second is for Google Sign-In
 5. Copy your **Client ID** and **Client Secret**
 
 #### c) Configure Backend Environment
@@ -75,22 +79,36 @@ Edit `backend/.env` with your credentials:
 ```env
 # Server Configuration
 PORT=3001
+NODE_ENV=development
 
-# Google OAuth Credentials
+# Frontend URL (for CORS and OAuth callbacks)
+FRONTEND_URL=http://localhost:5173
+
+# Backend API URL (for OAuth redirects)
+API_URL=http://localhost:3001
+
+# Google OAuth Credentials (used for both Gmail sync AND Google Sign-In)
 GOOGLE_CLIENT_ID=your_actual_client_id_here
 GOOGLE_CLIENT_SECRET=your_actual_client_secret_here
 GOOGLE_REDIRECT_URI=http://localhost:3001/api/auth/gmail/callback
 
-# Session Secret (generate a random string)
-SESSION_SECRET=your_random_secret_here_change_this
+# JWT Secret (for user authentication)
+JWT_SECRET=your_random_jwt_secret_here_change_this
+
+# Session Secret (for session management)
+SESSION_SECRET=your_random_session_secret_here_change_this
 
 # Database
 DATABASE_PATH=./database/careerpulse.db
 ```
 
-💡 **Tip**: Generate a secure session secret:
+💡 **Tip**: Generate secure secrets:
 ```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# Generate JWT secret
+openssl rand -base64 32
+
+# Generate session secret
+openssl rand -base64 32
 ```
 
 ### 3. Start the Application
@@ -115,15 +133,30 @@ npm run dev
 
 Frontend will run on **http://localhost:5173**
 
-## 🎮 Using CareerPulse
+## 🎮 Using JobFetch
 
 ### First Time Setup
 
 1. **Open** http://localhost:5173 in your browser
-2. **Click "Sync Gmail"** button in header
-3. **Authorize** CareerPulse to read your Gmail (read-only access)
-4. **Wait** for sync to complete (checks last 30 days of emails)
-5. **View** automatically extracted applications!
+2. **Sign Up** with one of these options:
+   - **Google Sign-In** (recommended): Click "Sign in with Google" for instant access
+   - **Email/Password**: Create an account with email and password
+3. Once logged in, **click "Sync Gmail"** button in header
+4. **Authorize** JobFetch to read your Gmail (read-only access)
+5. **Wait** for sync to complete (checks last 30 days of emails)
+6. **View** automatically extracted applications!
+
+### Authentication Options
+
+**Google Sign-In** (No password required):
+- Quick one-click authentication
+- Uses your existing Google account
+- Secure OAuth 2.0 flow
+
+**Email/Password** (Traditional):
+- Create account with email and password (min 8 characters)
+- Login anytime with your credentials
+- Password securely hashed with bcrypt
 
 ### Manual Entry
 

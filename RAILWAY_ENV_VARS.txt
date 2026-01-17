@@ -1,0 +1,44 @@
+===========================================
+RAILWAY ENVIRONMENT VARIABLES
+Copy these into Railway → Variables tab
+===========================================
+
+Essential Variables (for manual login):
+----------------------------------------
+
+NODE_ENV=production
+
+PORT=8080
+
+FRONTEND_URL=https://jobfetch.app
+
+API_URL=https://api.jobfetch.app
+
+JWT_SECRET=QWWQom+d6W+hYL+7HE/CXqN7wgi0DMX4NbXythE8nCQ=
+
+SESSION_SECRET=GK7RozzxDEQFUSZYMMXj4XWA08T6X2seJVnRxnxVhfU=
+
+DATABASE_PATH=/app/database/jobfetch.db
+
+
+===========================================
+HOW TO ADD THESE:
+===========================================
+
+1. In Railway, click on your service
+2. Go to "Variables" tab
+3. Click "New Variable"
+4. Add each variable name and value
+5. Railway will auto-redeploy
+
+===========================================
+GOOGLE OAUTH (Skip for now - add later):
+===========================================
+
+When you're ready to add Google Sign-In:
+
+GOOGLE_CLIENT_ID=your-client-id-here
+GOOGLE_CLIENT_SECRET=your-client-secret-here
+GOOGLE_REDIRECT_URI=https://api.jobfetch.app/api/auth/gmail/callback
+
+===========================================

@@ -1,6 +1,6 @@
 import express from 'express';
-import { createUser, getUserByEmail } from '../database/db.js';
-import { hashPassword, comparePassword, generateToken } from '../utils/auth.js';
+import { createUser, getUserByEmail, getUserById } from '../database/db.js';
+import { hashPassword, comparePassword, generateToken, authMiddleware } from '../utils/auth.js';
 
 const router = express.Router();
 
@@ -76,6 +76,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
+    // Check if user has a password (OAuth users don't have passwords)
+    if (!user.password) {
+      return res.status(401).json({ error: 'This account uses Google Sign-In. Please sign in with Google.' });
+    }
+    
     // Check password
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
@@ -102,17 +107,11 @@ router.post('/login', async (req, res) => {
 
 /**
  * GET /api/user/me
- * Get current user info
+ * Get current user info (protected route)
  */
-router.get('/me', async (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    // User info is added by auth middleware
-    if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
-    }
-    
-    const { getUserById } = await import('../database/db.js');
-    const user = await getUserById(req.user.userId);
+    const user = await getUserById(req.user.id);
     
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
