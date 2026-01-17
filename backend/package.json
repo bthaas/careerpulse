@@ -7,7 +7,13 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit/",
+    "test:properties": "vitest run tests/properties/",
+    "test:integration": "vitest run tests/integration/",
+    "test:e2e": "vitest run tests/e2e/",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
     "setup-secrets": "node scripts/setup-secrets.js"
   },
   "keywords": [
