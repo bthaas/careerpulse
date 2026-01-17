@@ -37,13 +37,13 @@ app.get('/api/health', (req, res) => {
 
 // Import routes
 import applicationsRouter from './routes/applications.js';
-// import authRouter from './routes/auth.js';
-// import emailRouter from './routes/email.js';
+import authRouter from './routes/auth.js';
+import emailRouter from './routes/email.js';
 
 // Register routes
 app.use('/api/applications', applicationsRouter);
-// app.use('/api/auth', authRouter);
-// app.use('/api/email', emailRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/email', emailRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
