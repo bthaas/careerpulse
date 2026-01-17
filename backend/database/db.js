@@ -160,7 +160,12 @@ export async function saveEmailConnection(connection) {
  * Get email connection
  */
 export async function getEmailConnection(userId) {
-  return await dbGet('SELECT * FROM email_connections WHERE userId = ? AND connected = 1', [userId]);
+  if (userId) {
+    return await dbGet('SELECT * FROM email_connections WHERE userId = ? AND connected = 1', [userId]);
+  } else {
+    // If no userId provided, return any connected user (useful for testing)
+    return await dbGet('SELECT * FROM email_connections WHERE connected = 1 LIMIT 1');
+  }
 }
 
 /**

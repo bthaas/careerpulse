@@ -149,6 +149,65 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
     }
   };
 
+  const handleConnectGmail = async () => {
+    try {
+      // Get Gmail OAuth URL
+      const response = await fetch(`${api.API_URL}/api/auth/gmail`, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      // Open OAuth flow in new window
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      window.open(
+        data.authUrl,
+        'Gmail OAuth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      
+      // Poll for connection status
+      const checkConnection = setInterval(async () => {
+        try {
+          const statusResponse = await fetch(`${api.API_URL}/api/auth/status`, {
+            credentials: 'include',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (statusResponse.ok) {
+            const status = await statusResponse.json();
+            if (status.connected) {
+              clearInterval(checkConnection);
+              alert('✅ Gmail connected successfully! You can now sync your emails.');
+            }
+          }
+        } catch (err) {
+          // Continue polling
+        }
+      }, 2000);
+      
+      // Stop polling after 2 minutes
+      setTimeout(() => clearInterval(checkConnection), 120000);
+      
+    } catch (err: any) {
+      console.error('Error connecting Gmail:', err);
+      alert('Failed to connect Gmail. Please try again.');
+    }
+  };
+
   const getSourceIcon = (source: string): string => {
     const iconMap: Record<string, string> = {
       'LinkedIn': 'work',
@@ -302,7 +361,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
             {applications.length === 0 ? (
               <EmptyState 
                 onAddManually={() => setIsAddModalOpen(true)}
-                onConnectEmail={() => alert('Gmail connection coming soon!')}
+                onConnectEmail={handleConnectGmail}
               />
             ) : (
               <ApplicationsTable 
