@@ -214,6 +214,52 @@ This specification defines the requirements for completing the CareerPulse/JobFe
 
 8.6. WHEN Gmail connection is saved, THE system SHALL log the userId and email
 
+### Requirement 9: Implement LLM-Based Email Parsing
+
+**User Story**: As a user, I want accurate extraction of job application details from emails so that my dashboard shows correct company names, job titles, and statuses.
+
+#### Acceptance Criteria
+
+9.1. WHEN an email is fetched from Gmail, THE system SHALL use a 3-stage pipeline to process it
+
+9.2. WHEN Stage 1 executes, THE system SHALL use Gmail API query with broad job-related keywords to filter emails
+
+9.3. WHEN Stage 2 executes, THE system SHALL use quick keyword matching to filter out obvious non-job emails (marketing, spam)
+
+9.4. WHEN Stage 3 executes, THE system SHALL use LLM (gpt-4o-mini) to classify and extract job details
+
+9.5. WHEN LLM processes an email, THE system SHALL extract: company name (not ATS platform), full job title, status (Applied/Interview/Offer/Rejected), and location
+
+9.6. WHEN LLM extraction succeeds, THE system SHALL cache the result to avoid duplicate API calls for the same email
+
+9.7. WHEN LLM extraction fails, THE system SHALL fall back to manual parsing algorithms
+
+9.8. WHEN saving application data, THE system SHALL indicate whether LLM was used for extraction
+
+9.9. WHEN LLM is used, THE confidence score SHALL be higher than manual parsing
+
+9.10. WHEN processing emails, THE system SHALL log LLM usage, costs, and response times for monitoring
+
+### Requirement 10: Optimize Email Parsing Accuracy
+
+**User Story**: As a user, I want the system to correctly identify actual companies (not ATS platforms like "Greenhouse" or "Workday") so that my applications are properly organized.
+
+#### Acceptance Criteria
+
+10.1. WHEN extracting company name, THE system SHALL identify the actual hiring company, not the ATS platform
+
+10.2. WHEN extracting job title, THE system SHALL capture the complete title, not fragments like "the" or "this"
+
+10.3. WHEN determining status, THE system SHALL use context to distinguish between "Applied", "Interview", "Offer", and "Rejected"
+
+10.4. WHEN an email contains "congratulations", THE system SHALL determine if it's for an interview or offer based on context
+
+10.5. WHEN an email contains rejection language, THE system SHALL correctly classify it as "Rejected" even with soft language
+
+10.6. WHEN location is mentioned, THE system SHALL extract city/state or identify "Remote" work
+
+10.7. WHEN location is not mentioned, THE system SHALL set location to "Not specified"
+
 ## Success Criteria
 
 The app completion is successful when:
@@ -228,6 +274,8 @@ The app completion is successful when:
 8. ✅ Email parsing correctly extracts job data from real emails
 9. ✅ All OAuth security measures are in place
 10. ✅ End-to-end flow works with r.w.chen88@gmail.com test account
+11. ✅ LLM-based parsing extracts accurate company names, job titles, and statuses
+12. ✅ Email parsing correctly handles ATS platforms (Greenhouse, Lever, Workday, etc.)
 
 ## Out of Scope
 

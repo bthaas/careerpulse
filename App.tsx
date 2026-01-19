@@ -138,9 +138,12 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
     } catch (err: any) {
       console.error('Error syncing emails:', err);
       
-      if (err.message.includes('Gmail not connected')) {
-        // Show connect Gmail prompt
-        alert('Please connect your Gmail account first to sync emails.');
+      if (err.message.includes('Gmail not connected') || err.message.includes('No Gmail connection')) {
+        // Automatically trigger connect flow
+        const shouldConnect = confirm('Gmail is not connected. Would you like to connect now?');
+        if (shouldConnect) {
+          await handleConnectGmail();
+        }
       } else {
         alert(`Failed to sync emails: ${err.message}`);
       }
@@ -339,7 +342,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
   };
 
   return (
-    <div className="flex flex-col h-full bg-background-light dark:bg-background-dark transition-colors duration-200">
+    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark transition-colors duration-200">
       <Header 
         toggleTheme={toggleTheme} 
         isDark={isDark} 
@@ -352,12 +355,12 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         user={user}
       />
       
-      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
+      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col min-h-0">
         {/* Top Stats */}
         {applications.length > 0 && <StatsCards applications={applications} />}
 
         {/* List View or Empty State */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0">
             {applications.length === 0 ? (
               <EmptyState 
                 onAddManually={() => setIsAddModalOpen(true)}

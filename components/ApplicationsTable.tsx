@@ -199,9 +199,9 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-left border-collapse">
-          <thead>
+          <thead className="sticky top-0 z-10">
             <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Company</th>
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[18%]">Role</th>

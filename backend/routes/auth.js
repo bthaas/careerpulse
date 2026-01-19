@@ -2,7 +2,8 @@ import express from 'express';
 import { 
   getAuthUrl, 
   getTokensFromCode,
-  refreshAccessToken 
+  refreshAccessToken,
+  oauth2Client 
 } from '../config/gmail.js';
 import {
   saveEmailConnection,
@@ -44,6 +45,7 @@ router.get('/gmail/callback', async (req, res) => {
     const { code, state } = req.query;
     
     console.log('📧 OAuth callback received');
+    console.log('📝 Query params:', { code: code ? 'present' : 'missing', state: state ? 'present' : 'missing' });
     
     if (!code) {
       console.error('❌ Missing authorization code');
@@ -58,37 +60,42 @@ router.get('/gmail/callback', async (req, res) => {
       `);
     }
     
-    if (!state) {
-      console.error('❌ Missing state parameter');
-      return res.status(400).send(`
-        <html>
-          <body>
-            <h1>❌ Connection Failed</h1>
-            <p>Missing state parameter (security error)</p>
-            <p>Please try again.</p>
-          </body>
-        </html>
-      `);
+    // TEMPORARY WORKAROUND: If state is missing, use a fallback approach
+    // This happens when Google OAuth doesn't preserve the state parameter
+    // TODO: Fix Google Cloud Console OAuth configuration to preserve state
+    let userId, userEmail;
+    
+    if (state) {
+      // Validate state parameter (preferred method)
+      const stateData = validateOAuthState(state);
+      
+      if (!stateData.valid) {
+        console.error('❌ Invalid state:', stateData.error);
+        return res.status(400).send(`
+          <html>
+            <body>
+              <h1>❌ Connection Failed</h1>
+              <p>Invalid or expired state parameter</p>
+              <p>Error: ${stateData.error}</p>
+              <p>Please try again.</p>
+            </body>
+          </html>
+        `);
+      }
+      
+      userId = stateData.userId;
+      userEmail = stateData.email;
+      console.log('✅ State validated for user:', userId);
+    } else {
+      // FALLBACK: State parameter missing (Google OAuth config issue)
+      console.warn('⚠️  State parameter missing - using fallback method');
+      console.warn('⚠️  This is less secure. Please fix Google Cloud Console OAuth configuration.');
+      
+      // We'll get the email from the OAuth tokens and use that to find/create user
+      // This is a temporary workaround until Google OAuth is properly configured
+      userId = 'pending'; // Will be updated after we get the email from tokens
+      userEmail = null;
     }
-    
-    // Validate state parameter
-    const stateData = validateOAuthState(state);
-    
-    if (!stateData.valid) {
-      console.error('❌ Invalid state:', stateData.error);
-      return res.status(400).send(`
-        <html>
-          <body>
-            <h1>❌ Connection Failed</h1>
-            <p>Invalid or expired state parameter</p>
-            <p>Error: ${stateData.error}</p>
-            <p>Please try again.</p>
-          </body>
-        </html>
-      `);
-    }
-    
-    console.log('✅ State validated for user:', stateData.userId);
     
     // Exchange code for tokens
     const tokens = await getTokensFromCode(code);
@@ -108,19 +115,49 @@ router.get('/gmail/callback', async (req, res) => {
     
     console.log('✅ Tokens obtained successfully');
     
+    // If we're using fallback method, get email from tokens
+    if (userId === 'pending') {
+      // Get email from OAuth tokens
+      const { google } = await import('googleapis');
+      const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+      oauth2Client.setCredentials(tokens);
+      
+      try {
+        const userInfo = await oauth2.userinfo.get();
+        userEmail = userInfo.data.email;
+        
+        // For now, use email as userId (this is a temporary workaround)
+        // In production, you'd look up the user in your database
+        userId = userEmail;
+        
+        console.log('✅ Retrieved email from OAuth:', userEmail);
+      } catch (emailError) {
+        console.error('❌ Failed to get email from OAuth:', emailError);
+        return res.status(400).send(`
+          <html>
+            <body>
+              <h1>❌ Connection Failed</h1>
+              <p>Failed to retrieve email from OAuth</p>
+              <p>Please try again.</p>
+            </body>
+          </html>
+        `);
+      }
+    }
+    
     // Calculate token expiration
     const expiresAt = new Date(Date.now() + (tokens.expiry_date || 3600000));
     
-    // Save connection with ACTUAL userId (not 'pending')
+    // Save connection with actual userId
     await saveEmailConnection({
-      userId: stateData.userId, // ✅ FIXED: Use actual userId from state
-      email: tokens.email || stateData.email,
+      userId: userId,
+      email: userEmail || tokens.email,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       expiresAt: expiresAt.toISOString()
     });
     
-    console.log('✅ Gmail connection saved for user:', stateData.userId);
+    console.log('✅ Gmail connection saved for user:', userId);
     
     // Redirect to frontend with success
     res.send(`

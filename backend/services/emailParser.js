@@ -1,254 +1,129 @@
 /**
  * Email Parser Service
  * Extracts job application data from email content
+ * Uses 3-stage pipeline: Gmail query → Keyword filter → LLM extraction
  */
 
-// Keywords for detecting job application emails
-const APPLICATION_KEYWORDS = [
-  'application received',
-  'thank you for applying',
-  'applied successfully',
-  'application submitted',
-  'your application',
-  'application for',
-  'position applied',
-  'role applied'
+import { extractWithLLM } from './llmParser.js';
+
+// Stage 2: Quick keyword filter for job-related emails
+const JOB_KEYWORDS = [
+  'application', 'apply', 'applied', 'interview', 'offer', 'position', 
+  'role', 'job', 'career', 'hiring', 'recruit', 'candidate', 'rejection', 
+  'rejected', 'thank you for', 'thanks for applying', 'congratulations',
+  'schedule', 'phone screen', 'video call', 'meet with', 'next steps'
 ];
 
-const INTERVIEW_KEYWORDS = [
-  'interview',
-  'schedule a call',
-  'phone screen',
-  'video call',
-  'meet with',
-  'speak with you',
-  'next steps',
-  'discussion about',
-  'zoom meeting',
-  'teams meeting'
-];
-
-const REJECTION_KEYWORDS = [
-  'unfortunately',
-  'not moving forward',
-  'rejected',
-  'declined',
-  'not selected',
-  'decided to pursue',
-  'other candidates',
-  'not a fit',
-  'will not be moving'
-];
-
-const OFFER_KEYWORDS = [
-  'offer',
-  'congratulations',
-  'pleased to offer',
-  'we would like to offer',
-  'extending an offer',
-  'offer letter',
-  'compensation package',
-  'start date'
+// Keywords that indicate non-job emails (marketing, spam)
+const SPAM_KEYWORDS = [
+  'unsubscribe', 'promotional', 'sale', 'discount', 'deal', 'coupon',
+  'newsletter', 'update your', 'verify your', 'reset password', 'confirm email'
 ];
 
 /**
- * Check if email is job-related
+ * Stage 2: Quick keyword filter
+ * Check if email is potentially job-related (fast, no cost)
  */
 export function isJobEmail(subject, body) {
   const text = `${subject} ${body}`.toLowerCase();
   
-  const allKeywords = [
-    ...APPLICATION_KEYWORDS,
-    ...INTERVIEW_KEYWORDS,
-    ...REJECTION_KEYWORDS,
-    ...OFFER_KEYWORDS
-  ];
+  // Check for job keywords
+  const hasJobKeyword = JOB_KEYWORDS.some(keyword => text.includes(keyword));
   
-  return allKeywords.some(keyword => text.includes(keyword));
-}
-
-/**
- * Determine application status from email content
- */
-export function detectStatus(subject, body) {
-  const text = `${subject} ${body}`.toLowerCase();
+  // Check for spam keywords
+  const hasSpamKeyword = SPAM_KEYWORDS.some(keyword => text.includes(keyword));
   
-  // Check in priority order (most specific first)
-  if (OFFER_KEYWORDS.some(keyword => text.includes(keyword))) {
-    return 'Offer';
+  // If has spam keywords but no job keywords, skip
+  if (hasSpamKeyword && !hasJobKeyword) {
+    return false;
   }
   
-  if (REJECTION_KEYWORDS.some(keyword => text.includes(keyword))) {
-    return 'Rejected';
-  }
-  
-  if (INTERVIEW_KEYWORDS.some(keyword => text.includes(keyword))) {
-    return 'Interview';
-  }
-  
-  if (APPLICATION_KEYWORDS.some(keyword => text.includes(keyword))) {
-    return 'Applied';
-  }
-  
-  return 'Applied'; // Default
-}
-
-/**
- * Extract company name from email
- * Tries multiple strategies:
- * 1. From email domain (e.g., jobs@company.com -> Company)
- * 2. From email body patterns
- */
-export function extractCompany(from, subject, body) {
-  // Strategy 1: Extract from email domain
-  const emailMatch = from.match(/@([^.]+)\./);
-  if (emailMatch) {
-    const domain = emailMatch[1];
-    // Skip common job board domains and generic domains
-    const skipDomains = ['greenhouse', 'lever', 'indeed', 'linkedin', 'workday', 'taleo', 'icims', 'smartrecruiters', 'example', 'test', 'noreply', 'recruiting'];
-    if (!skipDomains.includes(domain.toLowerCase())) {
-      return capitalize(domain);
-    }
-  }
-  
-  // Strategy 2: Look for "at [Company]" patterns in subject
-  const atMatch = subject.match(/at ([A-Z][A-Za-z0-9]+)/);
-  if (atMatch) {
-    return atMatch[1];
-  }
-  
-  // Strategy 3: Look for company names in body (simple pattern)
-  const companyPatterns = [
-    /applying to ([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)/,
-    /(?:at|with|join) ([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)/
-  ];
-  
-  for (const pattern of companyPatterns) {
-    const match = body.match(pattern);
-    if (match) {
-      return match[1];
-    }
-  }
-  
-  // Fallback: Use sender name or domain
-  const nameMatch = from.match(/^([^<]+)</);
-  if (nameMatch) {
-    return nameMatch[1].trim();
-  }
-  
-  return emailMatch ? capitalize(emailMatch[1]) : 'Unknown Company';
-}
-
-/**
- * Extract job title from email
- */
-export function extractJobTitle(subject, body) {
-  // Common patterns in subject lines
-  const patterns = [
-    /-\s*(.+?)(?:\s*-|$)/i,  // "Subject - Job Title" or "Subject - Job Title -"
-    /for (?:the )?(.+?) (?:position|role|job)/i,
-    /(.+?) (?:position|role|job)/i,
-    /application.*?for (?:the |a )?(.+?)(?:\sat|$)/i,
-    /regarding.*?(.+?)(?:\sposition|role|$)/i
-  ];
-  
-  for (const pattern of patterns) {
-    const match = subject.match(pattern);
-    if (match && match[1]) {
-      const title = cleanJobTitle(match[1]);
-      // Make sure we got a reasonable title (not too short)
-      if (title.length > 3 && !title.toLowerCase().includes('application')) {
-        return title;
-      }
-    }
-  }
-  
-  // Try body patterns
-  const bodyPatterns = [
-    /position of (?:the |a )?(.+?)(?:\.|$)/i,
-    /(?:for|as) (?:the |a )?(.+?) (?:position|role)/i,
-    /position:\s*(.+?)(?:\n|$)/i,
-    /role:\s*(.+?)(?:\n|$)/i
-  ];
-  
-  for (const pattern of bodyPatterns) {
-    const match = body.match(pattern);
-    if (match && match[1]) {
-      return cleanJobTitle(match[1]);
-    }
-  }
-  
-  return 'Unknown Position';
-}
-
-/**
- * Extract location from email
- */
-export function extractLocation(body) {
-  // Common patterns
-  const patterns = [
-    /location:\s*(.+?)(?:\n|$)/i,
-    /(?:in|at) ([A-Z][a-z]+(?:,\s*[A-Z]{2})?)/,
-    /remote/i
-  ];
-  
-  for (const pattern of patterns) {
-    const match = body.match(pattern);
-    if (match) {
-      const location = match[1] || match[0];
-      return location.trim();
-    }
-  }
-  
-  return 'Not specified';
+  // If has job keywords, proceed to LLM
+  return hasJobKeyword;
 }
 
 /**
  * Calculate confidence score (0-100)
- * Based on how many fields we successfully extracted
+ * Higher confidence for LLM results
  */
-export function calculateConfidence(company, role, status) {
+export function calculateConfidence(company, role, status, usedLLM) {
   let score = 0;
   
+  // Base score for LLM vs manual
+  if (usedLLM) {
+    score = 60; // LLM starts with higher confidence
+  } else {
+    score = 30; // Manual parsing starts lower
+  }
+  
   // Company extraction
-  if (company && company !== 'Unknown Company') {
-    score += 35;
+  if (company && company !== 'Unknown Company' && company !== 'Not specified') {
+    score += 15;
   }
   
   // Job title extraction
-  if (role && role !== 'Unknown Position') {
-    score += 35;
+  if (role && role !== 'Unknown Position' && role !== 'Not specified') {
+    score += 15;
   }
   
   // Status detection
-  if (status) {
-    score += 30;
+  if (status && status !== 'Applied') {
+    score += 10; // Higher confidence for specific statuses
   }
   
-  return score;
+  return Math.min(score, 100);
 }
 
 /**
  * Parse email and extract application data
+ * Uses 3-stage pipeline: Gmail query → Keyword filter → LLM extraction
  */
-export function parseEmail(email) {
+export async function parseEmail(email) {
   const { id, from, subject, body, date } = email;
   
-  // Check if it's a job-related email
+  // Stage 2: Quick keyword filter
   if (!isJobEmail(subject, body)) {
     return null;
   }
   
-  // Extract data
-  const company = extractCompany(from, subject, body);
-  const role = extractJobTitle(subject, body);
-  const location = extractLocation(body);
-  const status = detectStatus(subject, body);
-  const confidenceScore = calculateConfidence(company, role, status);
+  // Stage 3: LLM extraction (classify + extract)
+  let company, role, location, status;
+  let usedLLM = false;
   
-  // Format dates
+  try {
+    const llmResult = await extractWithLLM(from, subject, body);
+    if (llmResult) {
+      // Check if LLM classified it as a job email
+      if (llmResult.isJobEmail === false) {
+        return null; // LLM says not a job email
+      }
+      
+      company = llmResult.company;
+      role = llmResult.jobTitle;
+      status = llmResult.status;
+      location = llmResult.location;
+      usedLLM = true;
+    }
+  } catch (error) {
+    console.warn('LLM extraction failed:', error.message);
+    // Will skip this email since we don't have manual parsing fallback
+  }
+  
+  // If LLM failed or not available, skip this email
+  if (!usedLLM) {
+    console.warn(`Skipping email (LLM unavailable): ${subject}`);
+    return null;
+  }
+  
+  // Calculate confidence score
+  const confidenceScore = calculateConfidence(company, role, status, usedLLM);
+  
+  // Format dates (manual parsing - simple and reliable)
   const dateApplied = formatDate(date);
   const now = new Date().toISOString();
+  
+  // Determine remote policy from location
+  const remotePolicy = location && location.toLowerCase().includes('remote') ? 'Remote' : null;
   
   return {
     id: `email-${id}-${Date.now()}`,
@@ -261,30 +136,12 @@ export function parseEmail(email) {
     status,
     source: 'Email',
     salary: null,
-    remotePolicy: location.toLowerCase().includes('remote') ? 'Remote' : null,
-    notes: `Extracted from email: "${subject}"`,
+    remotePolicy,
+    notes: `Extracted from email: "${subject}" (LLM-enhanced)`,
     emailId: id,
     confidenceScore,
     isDuplicate: 0
   };
-}
-
-/**
- * Helper: Capitalize first letter
- */
-function capitalize(str) {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * Helper: Clean job title
- */
-function cleanJobTitle(title) {
-  return title
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/^(the|a|an)\s+/i, '');
 }
 
 /**
@@ -297,10 +154,6 @@ function formatDate(dateString) {
 
 export default {
   isJobEmail,
-  detectStatus,
-  extractCompany,
-  extractJobTitle,
-  extractLocation,
   calculateConfidence,
   parseEmail
 };
