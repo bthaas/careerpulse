@@ -33,6 +33,34 @@ export async function initializeDatabase() {
     await dbRun(statement);
   }
   console.log('✅ Database initialized successfully');
+  
+  // Fix orphaned email connections (connections without users)
+  await fixOrphanedConnections();
+}
+
+/**
+ * Fix email connections that don't have corresponding users
+ */
+async function fixOrphanedConnections() {
+  try {
+    const connections = await dbAll('SELECT * FROM email_connections WHERE connected = 1');
+    
+    for (const conn of connections) {
+      const user = await dbGet('SELECT * FROM users WHERE id = ?', [conn.userId]);
+      
+      if (!user) {
+        console.log(`🔧 Creating missing user for connection: ${conn.userId} (${conn.email})`);
+        await dbRun(`
+          INSERT INTO users (id, email, password, name)
+          VALUES (?, ?, NULL, ?)
+        `, [conn.userId, conn.email, conn.email.split('@')[0]]);
+        console.log(`✅ Created user: ${conn.userId}`);
+      }
+    }
+  } catch (error) {
+    console.error('⚠️  Error fixing orphaned connections:', error.message);
+    // Don't fail initialization if this fails
+  }
 }
 
 /**
