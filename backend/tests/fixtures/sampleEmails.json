@@ -1,0 +1,538 @@
+{
+  "applicationConfirmations": [
+    {
+      "id": "app-001",
+      "from": "jobs@stripe.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Received - Software Engineer",
+      "body": "Thank you for applying to the Software Engineer position at Stripe. We have received your application and our team will review it carefully. You can expect to hear back from us within 2-3 weeks.",
+      "date": "2024-01-15T10:30:00Z",
+      "snippet": "Thank you for applying to the Software Engineer position at Stripe...",
+      "threadId": "thread-001",
+      "labels": ["INBOX", "UNREAD"]
+    },
+    {
+      "id": "app-002",
+      "from": "recruiting@airbnb.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Your Application for Senior Backend Developer",
+      "body": "Hi there,\n\nThank you for your interest in the Senior Backend Developer role at Airbnb. Your application has been successfully submitted and is now under review by our hiring team.\n\nBest regards,\nAirbnb Recruiting Team",
+      "date": "2024-01-16T14:20:00Z",
+      "snippet": "Thank you for your interest in the Senior Backend Developer role...",
+      "threadId": "thread-002",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-003",
+      "from": "noreply@greenhouse.io",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Submitted - Full Stack Engineer at TechCorp",
+      "body": "Your application for Full Stack Engineer at TechCorp has been submitted successfully. Application ID: 12345. We will review your application and get back to you soon.",
+      "date": "2024-01-17T09:15:00Z",
+      "snippet": "Your application for Full Stack Engineer at TechCorp has been submitted...",
+      "threadId": "thread-003",
+      "labels": ["INBOX", "CATEGORY_UPDATES"]
+    },
+    {
+      "id": "app-004",
+      "from": "careers@netflix.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Received for Data Engineer Position",
+      "body": "Dear Candidate,\n\nThank you for applying to the Data Engineer position at Netflix. We appreciate your interest in joining our team. Our recruiting team will carefully review your application and reach out if your qualifications match our needs.\n\nNetflix Talent Acquisition",
+      "date": "2024-01-18T11:45:00Z",
+      "snippet": "Thank you for applying to the Data Engineer position at Netflix...",
+      "threadId": "thread-004",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-005",
+      "from": "jobs@lever.co",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application for Frontend Developer - Shopify",
+      "body": "Hello,\n\nYour application for the Frontend Developer role at Shopify has been received. We're excited to learn more about you! Our team will review your application and contact you with next steps.\n\nThank you,\nShopify Careers",
+      "date": "2024-01-19T16:30:00Z",
+      "snippet": "Your application for the Frontend Developer role at Shopify has been received...",
+      "threadId": "thread-005",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "app-006",
+      "from": "recruiting@meta.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Thank you for applying - Machine Learning Engineer",
+      "body": "Hi,\n\nThank you for your application to the Machine Learning Engineer position at Meta. We have received your materials and will be in touch if we'd like to move forward.\n\nMeta Recruiting",
+      "date": "2024-01-20T08:00:00Z",
+      "snippet": "Thank you for your application to the Machine Learning Engineer position...",
+      "threadId": "thread-006",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-007",
+      "from": "talent@uber.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Confirmation - DevOps Engineer",
+      "body": "Dear Applicant,\n\nWe have received your application for the DevOps Engineer position at Uber. Your profile is being reviewed by our hiring team. We appreciate your patience during this process.\n\nBest,\nUber Talent Team",
+      "date": "2024-01-21T13:20:00Z",
+      "snippet": "We have received your application for the DevOps Engineer position...",
+      "threadId": "thread-007",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-008",
+      "from": "noreply@indeed.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Your application to CloudTech Inc - Cloud Architect",
+      "body": "Your application to CloudTech Inc for the Cloud Architect position has been submitted via Indeed. The employer will review your application and contact you directly if they're interested.\n\nGood luck!\nIndeed Team",
+      "date": "2024-01-22T10:10:00Z",
+      "snippet": "Your application to CloudTech Inc for the Cloud Architect position...",
+      "threadId": "thread-008",
+      "labels": ["INBOX", "CATEGORY_UPDATES"]
+    },
+    {
+      "id": "app-009",
+      "from": "hr@microsoft.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Received - Principal Software Engineer",
+      "body": "Hello,\n\nThank you for your interest in the Principal Software Engineer role at Microsoft. Your application has been successfully received and will be reviewed by our hiring managers. We'll be in touch if your background is a match.\n\nMicrosoft Recruiting",
+      "date": "2024-01-23T15:45:00Z",
+      "snippet": "Thank you for your interest in the Principal Software Engineer role...",
+      "threadId": "thread-009",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-010",
+      "from": "careers@apple.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Your Application - iOS Developer",
+      "body": "Dear Candidate,\n\nThank you for applying to the iOS Developer position at Apple. We have received your application and our team is currently reviewing all submissions. If your qualifications align with our requirements, we will reach out to schedule next steps.\n\nApple Talent Acquisition",
+      "date": "2024-01-24T09:30:00Z",
+      "snippet": "Thank you for applying to the iOS Developer position at Apple...",
+      "threadId": "thread-010",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "app-011",
+      "from": "jobs@linkedin.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application for Security Engineer at CyberSafe",
+      "body": "Your application for Security Engineer at CyberSafe has been submitted through LinkedIn. The hiring team at CyberSafe will review your profile and reach out if they'd like to proceed.\n\nLinkedIn Jobs",
+      "date": "2024-01-25T12:00:00Z",
+      "snippet": "Your application for Security Engineer at CyberSafe has been submitted...",
+      "threadId": "thread-011",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "app-012",
+      "from": "recruiter@techstartup.io",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Received - Full Stack Developer",
+      "body": "Hi there!\n\nThanks for applying to the Full Stack Developer role at TechStartup. We're a fast-growing startup and we're excited to review your application. Our team will get back to you within a week.\n\nCheers,\nSarah - TechStartup Recruiting",
+      "date": "2024-01-26T14:15:00Z",
+      "snippet": "Thanks for applying to the Full Stack Developer role at TechStartup...",
+      "threadId": "thread-012",
+      "labels": ["INBOX"]
+    }
+  ],
+  "interviewInvitations": [
+    {
+      "id": "int-001",
+      "from": "recruiter@google.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview Invitation - Software Engineer",
+      "body": "Hi,\n\nWe were impressed with your application for the Software Engineer position at Google. We'd like to schedule a phone screen with you to discuss your background and the role in more detail.\n\nPlease let me know your availability for a 45-minute call next week.\n\nBest regards,\nJohn Smith\nGoogle Recruiting",
+      "date": "2024-01-27T10:00:00Z",
+      "snippet": "We were impressed with your application for the Software Engineer position...",
+      "threadId": "thread-013",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "int-002",
+      "from": "hiring@amazon.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Next Steps - Senior Developer Role",
+      "body": "Hello,\n\nThank you for your interest in the Senior Developer position at Amazon. We would like to invite you to a technical interview with our engineering team. The interview will be conducted via Zoom and will last approximately 60 minutes.\n\nPlease reply with your availability.\n\nAmazon Hiring Team",
+      "date": "2024-01-28T11:30:00Z",
+      "snippet": "We would like to invite you to a technical interview with our engineering team...",
+      "threadId": "thread-014",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "int-003",
+      "from": "talent@salesforce.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Schedule a Call - Product Manager Position",
+      "body": "Dear Candidate,\n\nWe're excited to move forward with your application for the Product Manager role at Salesforce. We'd like to schedule an initial conversation to learn more about your experience and discuss the opportunity.\n\nAre you available for a 30-minute video call this week?\n\nSalesforce Talent Team",
+      "date": "2024-01-29T09:45:00Z",
+      "snippet": "We're excited to move forward with your application for the Product Manager role...",
+      "threadId": "thread-015",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "int-004",
+      "from": "recruiting@tesla.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview - Embedded Systems Engineer",
+      "body": "Hi,\n\nWe reviewed your application for the Embedded Systems Engineer position and would like to speak with you. Can you join us for a technical phone screen next Tuesday or Wednesday?\n\nThe interview will cover your experience with embedded systems and C/C++ programming.\n\nTesla Recruiting",
+      "date": "2024-01-30T13:00:00Z",
+      "snippet": "We reviewed your application for the Embedded Systems Engineer position...",
+      "threadId": "thread-016",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "int-005",
+      "from": "hr@spotify.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Video Interview Invitation - Backend Engineer",
+      "body": "Hello,\n\nThank you for applying to the Backend Engineer role at Spotify. We'd like to invite you to a video interview with our engineering manager. The interview will be a mix of technical discussion and behavioral questions.\n\nPlease use this Calendly link to schedule: [link]\n\nSpotify HR",
+      "date": "2024-01-31T15:20:00Z",
+      "snippet": "We'd like to invite you to a video interview with our engineering manager...",
+      "threadId": "thread-017",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "int-006",
+      "from": "jobs@greenhouse.io",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview Request - Data Scientist at DataCorp",
+      "body": "Your application for Data Scientist at DataCorp has progressed to the interview stage. The hiring team would like to meet with you to discuss your experience with machine learning and data analysis.\n\nInterview Details:\n- Duration: 1 hour\n- Format: Video call (Teams)\n- Topics: ML algorithms, Python, SQL\n\nPlease confirm your availability.",
+      "date": "2024-02-01T10:30:00Z",
+      "snippet": "Your application for Data Scientist at DataCorp has progressed to the interview stage...",
+      "threadId": "thread-018",
+      "labels": ["INBOX", "CATEGORY_UPDATES"]
+    },
+    {
+      "id": "int-007",
+      "from": "recruiter@nvidia.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Phone Screen - AI Research Engineer",
+      "body": "Hi,\n\nWe're impressed with your background in AI and would like to schedule a phone screen for the AI Research Engineer position at NVIDIA. The conversation will focus on your research experience and technical skills.\n\nLet me know when you're available next week.\n\nBest,\nEmily Chen\nNVIDIA Recruiting",
+      "date": "2024-02-02T14:45:00Z",
+      "snippet": "We're impressed with your background in AI and would like to schedule a phone screen...",
+      "threadId": "thread-019",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "int-008",
+      "from": "talent@adobe.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Next Steps - UX Engineer Interview",
+      "body": "Dear Candidate,\n\nCongratulations! Your application for the UX Engineer role at Adobe has been selected for an interview. We'd like to schedule a conversation to discuss your design and engineering experience.\n\nThe interview will include:\n- Portfolio review\n- Technical discussion\n- Team fit assessment\n\nPlease reply with your availability.\n\nAdobe Talent Acquisition",
+      "date": "2024-02-03T11:15:00Z",
+      "snippet": "Your application for the UX Engineer role at Adobe has been selected for an interview...",
+      "threadId": "thread-020",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "int-009",
+      "from": "hiring@slack.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview Opportunity - Platform Engineer",
+      "body": "Hi there,\n\nWe'd love to speak with you about the Platform Engineer position at Slack. Your experience with distributed systems caught our attention. Can we schedule a Zoom meeting to discuss the role and your background?\n\nLooking forward to connecting!\n\nSlack Hiring Team",
+      "date": "2024-02-04T09:00:00Z",
+      "snippet": "We'd love to speak with you about the Platform Engineer position at Slack...",
+      "threadId": "thread-021",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "int-010",
+      "from": "careers@twitch.tv",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview Invitation - Live Streaming Engineer",
+      "body": "Hello,\n\nThank you for your application to the Live Streaming Engineer position at Twitch. We're excited to learn more about your video streaming experience. We'd like to schedule a technical interview with our team.\n\nInterview format: 90 minutes, coding + system design\n\nPlease let us know your availability.\n\nTwitch Careers",
+      "date": "2024-02-05T16:30:00Z",
+      "snippet": "We're excited to learn more about your video streaming experience...",
+      "threadId": "thread-022",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "int-011",
+      "from": "recruiter@coinbase.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Let's Chat - Blockchain Engineer Role",
+      "body": "Hi,\n\nYour profile stood out for our Blockchain Engineer position at Coinbase. I'd love to schedule a call to discuss your experience with blockchain technology and learn more about your career goals.\n\nAre you free for a 30-minute call this week?\n\nBest,\nMichael\nCoinbase Recruiting",
+      "date": "2024-02-06T10:45:00Z",
+      "snippet": "Your profile stood out for our Blockchain Engineer position at Coinbase...",
+      "threadId": "thread-023",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "int-012",
+      "from": "talent@square.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Interview - Mobile Engineer (iOS)",
+      "body": "Dear Candidate,\n\nWe're pleased to invite you to interview for the Mobile Engineer (iOS) position at Square. The interview will consist of a technical assessment and a discussion about your iOS development experience.\n\nInterview details will be sent in a separate calendar invite.\n\nSquare Talent Team",
+      "date": "2024-02-07T13:20:00Z",
+      "snippet": "We're pleased to invite you to interview for the Mobile Engineer (iOS) position...",
+      "threadId": "thread-024",
+      "labels": ["INBOX", "IMPORTANT"]
+    }
+  ],
+  "offers": [
+    {
+      "id": "offer-001",
+      "from": "hr@dropbox.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer Letter - Senior Software Engineer",
+      "body": "Dear Candidate,\n\nCongratulations! We are pleased to offer you the position of Senior Software Engineer at Dropbox. Your compensation package includes:\n\n- Base Salary: $180,000\n- Equity: 10,000 RSUs\n- Sign-on Bonus: $25,000\n- Start Date: March 1, 2024\n\nPlease review the attached offer letter and let us know if you have any questions.\n\nWe're excited to have you join our team!\n\nDropbox HR",
+      "date": "2024-02-08T14:00:00Z",
+      "snippet": "Congratulations! We are pleased to offer you the position of Senior Software Engineer...",
+      "threadId": "thread-025",
+      "labels": ["INBOX", "IMPORTANT", "STARRED"]
+    },
+    {
+      "id": "offer-002",
+      "from": "talent@lyft.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Congratulations - Backend Engineer Offer",
+      "body": "Hi,\n\nWe're thrilled to extend an offer for the Backend Engineer position at Lyft! After meeting with you, our team is confident you'll be a great addition.\n\nOffer Details:\n- Position: Backend Engineer\n- Salary: $165,000\n- Benefits: Full health coverage, 401k matching\n- Location: San Francisco, CA (Hybrid)\n\nPlease review the formal offer letter attached and let us know your decision by February 20th.\n\nLyft Talent Team",
+      "date": "2024-02-09T11:30:00Z",
+      "snippet": "We're thrilled to extend an offer for the Backend Engineer position at Lyft...",
+      "threadId": "thread-026",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "offer-003",
+      "from": "recruiting@pinterest.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Job Offer - Full Stack Engineer",
+      "body": "Dear Candidate,\n\nWe are excited to offer you the Full Stack Engineer position at Pinterest. Your skills and experience make you an excellent fit for our team.\n\nCompensation Package:\n- Annual Salary: $170,000\n- Stock Options: 5,000 shares\n- Annual Bonus: Up to 15%\n- Remote work available\n\nThe offer is valid until February 25th. We look forward to your response!\n\nPinterest Recruiting",
+      "date": "2024-02-10T09:15:00Z",
+      "snippet": "We are excited to offer you the Full Stack Engineer position at Pinterest...",
+      "threadId": "thread-027",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "offer-004",
+      "from": "hr@reddit.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer - Infrastructure Engineer at Reddit",
+      "body": "Hi,\n\nCongratulations! We would like to offer you the Infrastructure Engineer role at Reddit. We were impressed by your technical skills and cultural fit.\n\nOffer Summary:\n- Title: Infrastructure Engineer\n- Base: $175,000\n- Equity: $50,000 over 4 years\n- Benefits: Comprehensive health, dental, vision\n- Start: March 15, 2024\n\nPlease review and sign the offer letter by February 22nd.\n\nReddit HR Team",
+      "date": "2024-02-11T15:45:00Z",
+      "snippet": "We would like to offer you the Infrastructure Engineer role at Reddit...",
+      "threadId": "thread-028",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "offer-005",
+      "from": "careers@snap.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Extending an Offer - AR Engineer",
+      "body": "Dear Candidate,\n\nWe're pleased to extend an offer for the AR Engineer position at Snap Inc. Your expertise in augmented reality is exactly what we're looking for.\n\nOffer Details:\n- Position: AR Engineer\n- Compensation: $185,000 base + equity\n- Location: Los Angeles, CA\n- Perks: Relocation assistance, gym membership, catered meals\n\nWe're excited about the possibility of you joining Snap!\n\nSnap Careers Team",
+      "date": "2024-02-12T10:00:00Z",
+      "snippet": "We're pleased to extend an offer for the AR Engineer position at Snap Inc...",
+      "threadId": "thread-029",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "offer-006",
+      "from": "talent@zoom.us",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer Letter - Video Platform Engineer",
+      "body": "Hello,\n\nCongratulations! Zoom is pleased to offer you the Video Platform Engineer position. We believe your experience with real-time video systems will be invaluable to our team.\n\nCompensation:\n- Salary: $172,000\n- RSUs: $40,000 vesting over 4 years\n- Bonus: 10% target\n- Benefits: Full medical, dental, vision, 401k\n\nPlease respond by February 28th.\n\nZoom Talent Acquisition",
+      "date": "2024-02-13T13:30:00Z",
+      "snippet": "Zoom is pleased to offer you the Video Platform Engineer position...",
+      "threadId": "thread-030",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "offer-007",
+      "from": "hr@atlassian.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Job Offer - Senior DevOps Engineer",
+      "body": "Dear Candidate,\n\nWe are delighted to offer you the Senior DevOps Engineer position at Atlassian. Your experience with cloud infrastructure and CI/CD pipelines impressed our entire team.\n\nOffer Package:\n- Base Salary: $168,000\n- Stock Grant: $35,000\n- Annual Bonus: Up to 12%\n- Remote-first position\n- Start Date: April 1, 2024\n\nPlease review the attached documents and confirm your acceptance.\n\nAtlassian HR",
+      "date": "2024-02-14T11:00:00Z",
+      "snippet": "We are delighted to offer you the Senior DevOps Engineer position at Atlassian...",
+      "threadId": "thread-031",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "offer-008",
+      "from": "recruiting@databricks.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer - Data Platform Engineer",
+      "body": "Hi,\n\nWe're excited to offer you the Data Platform Engineer role at Databricks! Your background in distributed systems and big data is a perfect match for our team.\n\nCompensation Details:\n- Base: $190,000\n- Equity: Significant stock options\n- Bonus: 15% target\n- Benefits: Comprehensive package\n\nWe hope you'll join us in revolutionizing data analytics!\n\nDatabricks Recruiting",
+      "date": "2024-02-15T14:20:00Z",
+      "snippet": "We're excited to offer you the Data Platform Engineer role at Databricks...",
+      "threadId": "thread-032",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "offer-009",
+      "from": "talent@github.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Congratulations! Offer for Staff Engineer",
+      "body": "Dear Candidate,\n\nCongratulations! GitHub is pleased to offer you the Staff Engineer position. We were thoroughly impressed by your technical depth and leadership experience.\n\nOffer Summary:\n- Title: Staff Engineer\n- Salary: $195,000\n- RSUs: $60,000 over 4 years\n- Signing Bonus: $30,000\n- Location: Remote (US)\n\nPlease review the formal offer and let us know by March 1st.\n\nGitHub Talent Team",
+      "date": "2024-02-16T09:45:00Z",
+      "snippet": "GitHub is pleased to offer you the Staff Engineer position...",
+      "threadId": "thread-033",
+      "labels": ["INBOX", "IMPORTANT", "STARRED"]
+    },
+    {
+      "id": "offer-010",
+      "from": "hr@shopify.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer Letter - E-commerce Platform Engineer",
+      "body": "Hello,\n\nWe're thrilled to offer you the E-commerce Platform Engineer position at Shopify. Your experience building scalable systems is exactly what we need.\n\nCompensation:\n- Annual Salary: $178,000\n- Stock Options: 8,000 shares\n- Benefits: Health, dental, vision, RRSP matching\n- Work arrangement: Flexible remote\n\nWe look forward to having you on the team!\n\nShopify HR",
+      "date": "2024-02-17T12:15:00Z",
+      "snippet": "We're thrilled to offer you the E-commerce Platform Engineer position at Shopify...",
+      "threadId": "thread-034",
+      "labels": ["INBOX", "STARRED"]
+    },
+    {
+      "id": "offer-011",
+      "from": "careers@cloudflare.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Job Offer - Network Engineer",
+      "body": "Dear Candidate,\n\nCloudflare is excited to offer you the Network Engineer position. Your expertise in network protocols and security will be a great asset to our infrastructure team.\n\nOffer Details:\n- Position: Network Engineer\n- Base Salary: $165,000\n- Equity: Stock options\n- Location: San Francisco or Austin\n- Start Date: March 20, 2024\n\nPlease confirm your acceptance by February 28th.\n\nCloudflare Careers",
+      "date": "2024-02-18T15:00:00Z",
+      "snippet": "Cloudflare is excited to offer you the Network Engineer position...",
+      "threadId": "thread-035",
+      "labels": ["INBOX", "IMPORTANT"]
+    },
+    {
+      "id": "offer-012",
+      "from": "recruiting@figma.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Offer - Product Engineer at Figma",
+      "body": "Hi,\n\nWe're delighted to extend an offer for the Product Engineer role at Figma! Your passion for design tools and engineering excellence really stood out.\n\nCompensation Package:\n- Salary: $182,000\n- Equity: Generous stock options\n- Bonus: 10% annual target\n- Benefits: Comprehensive health coverage, unlimited PTO\n- Remote-friendly\n\nWe can't wait for you to join the Figma team!\n\nFigma Recruiting",
+      "date": "2024-02-19T10:30:00Z",
+      "snippet": "We're delighted to extend an offer for the Product Engineer role at Figma...",
+      "threadId": "thread-036",
+      "labels": ["INBOX", "STARRED"]
+    }
+  ],
+  "rejections": [
+    {
+      "id": "rej-001",
+      "from": "noreply@oracle.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Status Update",
+      "body": "Dear Applicant,\n\nThank you for your interest in the Database Engineer position at Oracle. After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match our current needs.\n\nWe appreciate the time you invested in the application process and wish you the best in your job search.\n\nOracle Recruiting",
+      "date": "2024-02-20T09:00:00Z",
+      "snippet": "After careful consideration, we have decided to move forward with other candidates...",
+      "threadId": "thread-037",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-002",
+      "from": "talent@ibm.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Update on Your Application - Cloud Solutions Architect",
+      "body": "Dear Candidate,\n\nThank you for applying to the Cloud Solutions Architect position at IBM. Unfortunately, we will not be moving forward with your application at this time. The competition was strong, and we had to make difficult decisions.\n\nWe encourage you to apply for future opportunities that match your skills.\n\nBest regards,\nIBM Talent Acquisition",
+      "date": "2024-02-21T11:30:00Z",
+      "snippet": "Unfortunately, we will not be moving forward with your application at this time...",
+      "threadId": "thread-038",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-003",
+      "from": "recruiting@intel.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Re: Hardware Engineer Position",
+      "body": "Hi,\n\nThank you for your interest in the Hardware Engineer role at Intel. After reviewing your application and interviewing several candidates, we have decided not to proceed with your candidacy.\n\nWe appreciate your time and interest in Intel. We wish you success in your career.\n\nIntel Recruiting Team",
+      "date": "2024-02-22T14:15:00Z",
+      "snippet": "We have decided not to proceed with your candidacy...",
+      "threadId": "thread-039",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-004",
+      "from": "hr@cisco.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Decision - Network Security Engineer",
+      "body": "Dear Applicant,\n\nThank you for applying for the Network Security Engineer position at Cisco. We received many qualified applications and, unfortunately, we are not able to move forward with your application.\n\nWe encourage you to continue checking our careers page for other opportunities.\n\nCisco HR",
+      "date": "2024-02-23T10:45:00Z",
+      "snippet": "Unfortunately, we are not able to move forward with your application...",
+      "threadId": "thread-040",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-005",
+      "from": "careers@vmware.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Your Application for Virtualization Engineer",
+      "body": "Hello,\n\nThank you for your interest in the Virtualization Engineer position at VMware. After careful review, we have decided to pursue other candidates whose experience more closely aligns with our requirements.\n\nWe appreciate your interest in VMware and wish you well in your job search.\n\nVMware Careers Team",
+      "date": "2024-02-24T13:00:00Z",
+      "snippet": "We have decided to pursue other candidates whose experience more closely aligns...",
+      "threadId": "thread-041",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-006",
+      "from": "talent@paypal.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Status - Payment Systems Engineer",
+      "body": "Dear Candidate,\n\nThank you for your application to the Payment Systems Engineer role at PayPal. We appreciate your interest in our company. Unfortunately, we have decided to move forward with candidates who have more direct experience in payment processing systems.\n\nWe wish you the best in your career endeavors.\n\nPayPal Talent Team",
+      "date": "2024-02-25T15:30:00Z",
+      "snippet": "We have decided to move forward with candidates who have more direct experience...",
+      "threadId": "thread-042",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-007",
+      "from": "recruiting@dell.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Update Regarding Your Application",
+      "body": "Hi,\n\nThank you for applying to the Systems Engineer position at Dell Technologies. After reviewing all applications, we regret to inform you that we will not be moving forward with your candidacy at this time.\n\nWe encourage you to apply for other positions that match your qualifications.\n\nDell Recruiting",
+      "date": "2024-02-26T09:20:00Z",
+      "snippet": "We regret to inform you that we will not be moving forward with your candidacy...",
+      "threadId": "thread-043",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-008",
+      "from": "hr@hp.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Decision - Software Developer",
+      "body": "Dear Applicant,\n\nThank you for your interest in the Software Developer position at HP. We have completed our review process and unfortunately, we are not able to offer you a position at this time. The selection process was highly competitive.\n\nWe appreciate your interest in HP and wish you success in your job search.\n\nHP Human Resources",
+      "date": "2024-02-27T11:45:00Z",
+      "snippet": "Unfortunately, we are not able to offer you a position at this time...",
+      "threadId": "thread-044",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-009",
+      "from": "careers@sap.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Your Application - Enterprise Software Engineer",
+      "body": "Hello,\n\nThank you for applying for the Enterprise Software Engineer position at SAP. After careful consideration of all candidates, we have decided to pursue other applicants whose backgrounds are a better fit for this particular role.\n\nWe appreciate your time and interest in SAP.\n\nSAP Careers",
+      "date": "2024-02-28T14:00:00Z",
+      "snippet": "We have decided to pursue other applicants whose backgrounds are a better fit...",
+      "threadId": "thread-045",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-010",
+      "from": "talent@servicenow.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Update - Platform Developer",
+      "body": "Dear Candidate,\n\nThank you for your application to the Platform Developer role at ServiceNow. We have reviewed your qualifications and, unfortunately, we will not be moving forward with your application. We received an overwhelming number of applications for this position.\n\nWe encourage you to explore other opportunities at ServiceNow.\n\nServiceNow Talent Acquisition",
+      "date": "2024-02-29T10:15:00Z",
+      "snippet": "Unfortunately, we will not be moving forward with your application...",
+      "threadId": "thread-046",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-011",
+      "from": "recruiting@workday.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Re: Application for Backend Engineer",
+      "body": "Hi,\n\nThank you for your interest in the Backend Engineer position at Workday. After reviewing your application, we have decided to move forward with other candidates who more closely match our current requirements.\n\nWe appreciate the time you took to apply and wish you the best.\n\nWorkday Recruiting",
+      "date": "2024-03-01T12:30:00Z",
+      "snippet": "We have decided to move forward with other candidates who more closely match...",
+      "threadId": "thread-047",
+      "labels": ["INBOX"]
+    },
+    {
+      "id": "rej-012",
+      "from": "hr@autodesk.com",
+      "to": "r.w.chen88@gmail.com",
+      "subject": "Application Status - Graphics Engineer",
+      "body": "Dear Applicant,\n\nThank you for applying to the Graphics Engineer position at Autodesk. We appreciate your interest in our company. After careful review, we have decided not to move forward with your application. We had many strong candidates and had to make difficult choices.\n\nWe wish you success in finding the right opportunity.\n\nAutodesk HR Team",
+      "date": "2024-03-02T15:45:00Z",
+      "snippet": "We have decided not to move forward with your application...",
+      "threadId": "thread-048",
+      "labels": ["INBOX"]
+    }
+  ]
+}

@@ -3,9 +3,11 @@
  * Handles all communication with the backend API
  */
 
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://api.jobfetch.app/api'
-  : 'http://localhost:3001/api';
+export const API_URL = import.meta.env.PROD 
+  ? 'https://api.jobfetch.app'
+  : 'http://localhost:3001';
+
+const API_BASE_URL = `${API_URL}/api`;
 
 /**
  * Make API request with error handling

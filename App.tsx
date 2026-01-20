@@ -146,14 +146,76 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
     } catch (err: any) {
       console.error('Error syncing emails:', err);
       
-      if (err.message.includes('Gmail not connected')) {
-        // Show connect Gmail prompt
-        alert('Please connect your Gmail account first to sync emails.');
+      if (err.message.includes('Gmail not connected') || err.message.includes('No Gmail connection')) {
+        // Automatically trigger connect flow
+        const shouldConnect = confirm('Gmail is not connected. Would you like to connect now?');
+        if (shouldConnect) {
+          await handleConnectGmail();
+        }
       } else {
         alert(`Failed to sync emails: ${err.message}`);
       }
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleConnectGmail = async () => {
+    try {
+      // Get Gmail OAuth URL
+      const response = await fetch(`${api.API_URL}/api/auth/gmail`, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      // Open OAuth flow in new window
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      window.open(
+        data.authUrl,
+        'Gmail OAuth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      
+      // Poll for connection status
+      const checkConnection = setInterval(async () => {
+        try {
+          const statusResponse = await fetch(`${api.API_URL}/api/auth/status`, {
+            credentials: 'include',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+          });
+          
+          if (statusResponse.ok) {
+            const status = await statusResponse.json();
+            if (status.connected) {
+              clearInterval(checkConnection);
+              alert('✅ Gmail connected successfully! You can now sync your emails.');
+            }
+          }
+        } catch (err) {
+          // Continue polling
+        }
+      }, 2000);
+      
+      // Stop polling after 2 minutes
+      setTimeout(() => clearInterval(checkConnection), 120000);
+      
+    } catch (err: any) {
+      console.error('Error connecting Gmail:', err);
+      alert('Failed to connect Gmail. Please try again.');
     }
   };
 
@@ -288,7 +350,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
   };
 
   return (
-    <div className="flex flex-col h-full bg-background-light dark:bg-background-dark transition-colors duration-200">
+    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark transition-colors duration-200">
       <Header 
         toggleTheme={toggleTheme} 
         isDark={isDark} 
@@ -301,16 +363,17 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         user={user}
       />
       
-      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
+<<<<<<< HEAD
+      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col min-h-0">
         {/* Top Stats - Always visible */}
         <StatsCards applications={applications} />
 
         {/* List View or Empty State */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0">
             {applications.length === 0 ? (
               <EmptyState 
                 onAddManually={() => setIsAddModalOpen(true)}
-                onConnectEmail={() => alert('Gmail connection coming soon!')}
+                onConnectEmail={handleConnectGmail}
               />
             ) : (
               <ApplicationsTable 

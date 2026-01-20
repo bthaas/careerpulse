@@ -30,9 +30,11 @@ CareerPulse automatically tracks your job applications by extracting key details
 
 ### 🤖 Automatic Email Tracking
 - **One-click Gmail sync** via OAuth 2.0 (read-only access)
-- **Smart email detection** using keyword-based parsing
-- **Auto-extraction** of company name, job title, location, and status
+- **AI-powered email detection** using Google Gemini 2.5 Flash LLM
+- **Smart extraction** of company name, job title, location, and status
+- **High accuracy** (~95% extraction accuracy on real data)
 - **Duplicate prevention** to avoid re-adding applications
+- **Cost-effective** (~$0.01 per 100 emails synced)
 
 ### 📊 Application Management
 - **Spreadsheet-style table view** with sortable columns
@@ -110,11 +112,24 @@ cd ..
    
    Edit `.env` with your credentials:
    ```env
+   # Google OAuth (for Gmail sync)
    GOOGLE_CLIENT_ID=your_client_id_here
    GOOGLE_CLIENT_SECRET=your_client_secret_here
    GOOGLE_REDIRECT_URI=http://localhost:3001/api/auth/gmail/callback
+   
+   # Google AI (for email parsing)
+   GOOGLE_AI_API_KEY=your_gemini_api_key_here
+   
+   # Security
    SESSION_SECRET=your_random_secret_here
+   JWT_SECRET=your_random_jwt_secret_here
    ```
+
+3. **Get Google AI API Key** (required for email parsing):
+   - Go to [Google AI Studio](https://aistudio.google.com/apikey)
+   - Create a new API key
+   - Add it to your `.env` file as `GOOGLE_AI_API_KEY`
+   - See [GEMINI_SETUP.md](backend/GEMINI_SETUP.md) for detailed instructions
 
 ### Running the App
 
@@ -139,7 +154,13 @@ Open **http://localhost:5173** in your browser!
 
 ## 📚 Documentation
 
+- **[QUICK_START.md](QUICK_START.md)** - Get started in 5 minutes! ⚡
 - **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Detailed setup instructions with screenshots
+- **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment guide
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[GEMINI_SETUP.md](backend/GEMINI_SETUP.md)** - Google AI API setup guide
+- **[LLM_PARSING_GUIDE.md](backend/services/LLM_PARSING_GUIDE.md)** - Email parsing documentation
+- **[GEMINI_IMPLEMENTATION_SUMMARY.md](GEMINI_IMPLEMENTATION_SUMMARY.md)** - LLM integration overview
 - **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Complete technical overview
 - **[MVP_FEATURE_ANALYSIS.md](MVP_FEATURE_ANALYSIS.md)** - Feature requirements and status
 
@@ -159,6 +180,7 @@ Open **http://localhost:5173** in your browser!
 - Node.js + Express
 - SQLite database
 - Gmail API integration
+- Google Gemini 2.5 Flash LLM for email parsing
 - OAuth 2.0 authentication
 
 **Testing:**

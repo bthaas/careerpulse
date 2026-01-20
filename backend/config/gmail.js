@@ -22,13 +22,21 @@ export const GMAIL_SCOPES = [
 
 /**
  * Generate Gmail OAuth URL for user authorization
+ * @param {string} state - Optional OAuth state parameter for security
  */
-export function getAuthUrl() {
-  return oauth2Client.generateAuthUrl({
+export function getAuthUrl(state = null) {
+  const config = {
     access_type: 'offline', // Get refresh token
     scope: GMAIL_SCOPES,
     prompt: 'consent' // Force consent screen to get refresh token
-  });
+  };
+  
+  // Add state parameter if provided
+  if (state) {
+    config.state = state;
+  }
+  
+  return oauth2Client.generateAuthUrl(config);
 }
 
 /**

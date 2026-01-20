@@ -1,0 +1,379 @@
+{
+  "missingFields": [
+    {
+      "id": "edge_missing_company",
+      "threadId": "thread_edge_1",
+      "labelIds": ["INBOX"],
+      "snippet": "Thank you for your application. We'll review it and get back to you soon.",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "noreply@unknown.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Received" },
+          { "name": "Date", "value": "Mon, 15 Jan 2026 10:00:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsggeW91IGZvciB5b3VyIGFwcGxpY2F0aW9uLiBXZSdsbCByZXZpZXcgaXQgYW5kIGdldCBiYWNrIHRvIHlvdSBzb29uLg=="
+        }
+      },
+      "internalDate": "1736956800000"
+    },
+    {
+      "id": "edge_missing_role",
+      "threadId": "thread_edge_2",
+      "labelIds": ["INBOX"],
+      "snippet": "Thank you for applying to TechCorp. Your application has been received.",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@techcorp.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Confirmation - TechCorp" },
+          { "name": "Date", "value": "Tue, 16 Jan 2026 14:30:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsggeW91IGZvciBhcHBseWluZyB0byBUZWNoQ29ycC4gWW91ciBhcHBsaWNhdGlvbiBoYXMgYmVlbiByZWNlaXZlZC4="
+        }
+      },
+      "internalDate": "1737059400000"
+    },
+    {
+      "id": "edge_missing_location",
+      "threadId": "thread_edge_3",
+      "labelIds": ["INBOX"],
+      "snippet": "We received your application for Senior Developer at GlobalTech.",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "recruiting@globaltech.io" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Received: Senior Developer" },
+          { "name": "Date", "value": "Wed, 17 Jan 2026 09:15:00 -0800" }
+        ],
+        "body": {
+          "data": "V2UgcmVjZWl2ZWQgeW91ciBhcHBsaWNhdGlvbiBmb3IgU2VuaW9yIERldmVsb3BlciBhdCBHbG9iYWxUZWNoLg=="
+        }
+      },
+      "internalDate": "1737127500000"
+    },
+    {
+      "id": "edge_missing_date",
+      "threadId": "thread_edge_4",
+      "labelIds": ["INBOX"],
+      "snippet": "Your application for Software Engineer at DataCorp has been received.",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "careers@datacorp.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Confirmation" }
+        ],
+        "body": {
+          "data": "WW91ciBhcHBsaWNhdGlvbiBmb3IgU29mdHdhcmUgRW5naW5lZXIgYXQgRGF0YUNvcnAgaGFzIGJlZW4gcmVjZWl2ZWQu"
+        }
+      },
+      "internalDate": "1737213900000"
+    }
+  ],
+  "malformedEmails": [
+    {
+      "id": "edge_invalid_encoding",
+      "threadId": "thread_edge_5",
+      "labelIds": ["INBOX"],
+      "snippet": "Application confirmation with invalid encoding",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@brokentech.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "=?UTF-8?B?QXBwbGljYXRpb24gQ29uZmlybWF0aW9u?=" },
+          { "name": "Date", "value": "Thu, 18 Jan 2026 11:00:00 -0800" }
+        ],
+        "body": {
+          "data": "INVALID_BASE64_DATA_###"
+        }
+      },
+      "internalDate": "1737220800000"
+    },
+    {
+      "id": "edge_corrupted_headers",
+      "threadId": "thread_edge_6",
+      "labelIds": ["INBOX"],
+      "snippet": "Email with corrupted headers",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "" },
+          { "name": "Date", "value": "Invalid Date String" }
+        ],
+        "body": {
+          "data": "VGhhbmsggeW91IGZvciB5b3VyIGFwcGxpY2F0aW9uLg=="
+        }
+      },
+      "internalDate": "1737307200000"
+    },
+    {
+      "id": "edge_missing_payload",
+      "threadId": "thread_edge_7",
+      "labelIds": ["INBOX"],
+      "snippet": "Email with missing payload body",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "noreply@missingdata.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Update" },
+          { "name": "Date", "value": "Fri, 19 Jan 2026 15:45:00 -0800" }
+        ]
+      },
+      "internalDate": "1737410700000"
+    },
+    {
+      "id": "edge_nested_multipart",
+      "threadId": "thread_edge_8",
+      "labelIds": ["INBOX"],
+      "snippet": "Complex multipart email structure",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "complex@multipart.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Software Engineer - Application" },
+          { "name": "Date", "value": "Sat, 20 Jan 2026 10:00:00 -0800" }
+        ],
+        "parts": [
+          {
+            "mimeType": "text/plain",
+            "body": { "data": "" }
+          },
+          {
+            "mimeType": "text/html",
+            "parts": [
+              {
+                "body": { "data": "PGh0bWw+PGJvZHk+VGhhbmsgeW91IGZvciBhcHBseWluZyE8L2JvZHk+PC9odG1sPg==" }
+              }
+            ]
+          }
+        ]
+      },
+      "internalDate": "1737376800000"
+    }
+  ],
+  "specialCharacters": [
+    {
+      "id": "edge_unicode_company",
+      "threadId": "thread_edge_9",
+      "labelIds": ["INBOX"],
+      "snippet": "Application confirmation from company with unicode characters",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@café-tech.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Received: Frontend Developer at Café Tech™" },
+          { "name": "Date", "value": "Sun, 21 Jan 2026 12:00:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsgeW91IGZvciBhcHBseWluZyB0byBDYWbDqSBUZWNo4oSiIGZvciB0aGUgRnJvbnRlbmQgRGV2ZWxvcGVyIHBvc2l0aW9uIGluIFNhbiBGcmFuY2lzY28sIENBLg=="
+        }
+      },
+      "internalDate": "1737470400000"
+    },
+    {
+      "id": "edge_emoji_subject",
+      "threadId": "thread_edge_10",
+      "labelIds": ["INBOX"],
+      "snippet": "Email with emojis in subject and body",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "recruiting@coolstartup.io" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "🎉 Application Received: Full Stack Engineer 🚀" },
+          { "name": "Date", "value": "Mon, 22 Jan 2026 09:30:00 -0800" }
+        ],
+        "body": {
+          "data": "8J+OiSBUaGFuayB5b3UgZm9yIGFwcGx5aW5nIHRvIENvb2xTdGFydHVwIGZvciBGdWxsIFN0YWNrIEVuZ2luZWVyIGluIE5ldyBZb3JrLCBOWSDwn5qA"
+        }
+      },
+      "internalDate": "1737548200000"
+    },
+    {
+      "id": "edge_special_symbols",
+      "threadId": "thread_edge_11",
+      "labelIds": ["INBOX"],
+      "snippet": "Email with special symbols and accents",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "careers@müller-tech.de" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Bewerbung: Senior Engineer @ Müller & Söhne GmbH" },
+          { "name": "Date", "value": "Tue, 23 Jan 2026 14:15:00 -0800" }
+        ],
+        "body": {
+          "data": "VmlsZW4gRGFuayBmw7xyIElocmUgQmV3ZXJidW5nIGJlaSBNw7xsbGVyICYgU8O2aG5lIEdtYkggZsO8ciBkaWUgUG9zaXRpb24gU2VuaW9yIEVuZ2luZWVyIGluIEJlcmxpbiwgR2VybWFueS4="
+        }
+      },
+      "internalDate": "1737665700000"
+    },
+    {
+      "id": "edge_html_entities",
+      "threadId": "thread_edge_12",
+      "labelIds": ["INBOX"],
+      "snippet": "Email with HTML entities and escaped characters",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@tech&co.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application: Software Engineer @ Tech&Co" },
+          { "name": "Date", "value": "Wed, 24 Jan 2026 10:45:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsgeW91IGZvciBhcHBseWluZyB0byBUZWNoJmFtcDtDbyBmb3IgU29mdHdhcmUgRW5naW5lZXIgaW4gU2FuIEZyYW5jaXNjbyAmZ3Q7IENBLg=="
+        }
+      },
+      "internalDate": "1737739500000"
+    }
+  ],
+  "emptyAndNonJob": [
+    {
+      "id": "edge_empty_body",
+      "threadId": "thread_edge_13",
+      "labelIds": ["INBOX"],
+      "snippet": "",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "noreply@empty.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Empty Email" },
+          { "name": "Date", "value": "Thu, 25 Jan 2026 08:00:00 -0800" }
+        ],
+        "body": {
+          "data": ""
+        }
+      },
+      "internalDate": "1737817200000"
+    },
+    {
+      "id": "edge_non_job_newsletter",
+      "threadId": "thread_edge_14",
+      "labelIds": ["INBOX"],
+      "snippet": "Weekly tech newsletter with latest industry news",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "newsletter@technews.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Tech Weekly: Top Stories This Week" },
+          { "name": "Date", "value": "Fri, 26 Jan 2026 12:00:00 -0800" }
+        ],
+        "body": {
+          "data": "V2Vla2x5IHRlY2ggbmV3c2xldHRlciB3aXRoIGxhdGVzdCBpbmR1c3RyeSBuZXdzIGFuZCB0cmVuZHMu"
+        }
+      },
+      "internalDate": "1737921600000"
+    },
+    {
+      "id": "edge_non_job_personal",
+      "threadId": "thread_edge_15",
+      "labelIds": ["INBOX"],
+      "snippet": "Hey, want to grab coffee this weekend?",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "friend@personal.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Coffee this weekend?" },
+          { "name": "Date", "value": "Sat, 27 Jan 2026 15:30:00 -0800" }
+        ],
+        "body": {
+          "data": "SGV5LCB3YW50IHRvIGdyYWIgY29mZmVlIHRoaXMgd2Vla2VuZD8="
+        }
+      },
+      "internalDate": "1738021800000"
+    },
+    {
+      "id": "edge_non_job_spam",
+      "threadId": "thread_edge_16",
+      "labelIds": ["INBOX", "SPAM"],
+      "snippet": "Congratulations! You've won $1,000,000! Click here to claim your prize!",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "winner@lottery-scam.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "YOU WON!!!" },
+          { "name": "Date", "value": "Sun, 28 Jan 2026 20:00:00 -0800" }
+        ],
+        "body": {
+          "data": "Q29uZ3JhdHVsYXRpb25zISBZb3UndmUgd29uICQxLDAwMCwwMDAhIENsaWNrIGhlcmUgdG8gY2xhaW0geW91ciBwcml6ZSE="
+        }
+      },
+      "internalDate": "1738137600000"
+    }
+  ],
+  "extremeCases": [
+    {
+      "id": "edge_very_long_subject",
+      "threadId": "thread_edge_17",
+      "labelIds": ["INBOX"],
+      "snippet": "Application confirmation with extremely long subject line",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@verbosetech.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Received: Senior Full Stack Software Engineer with expertise in React, Node.js, TypeScript, PostgreSQL, MongoDB, Redis, Docker, Kubernetes, AWS, CI/CD, Microservices Architecture, and Agile Development Methodologies - Remote Position Available" },
+          { "name": "Date", "value": "Mon, 29 Jan 2026 09:00:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsgeW91IGZvciBhcHBseWluZyB0byBWZXJib3NlVGVjaCBmb3IgdGhlIFNlbmlvciBGdWxsIFN0YWNrIFNvZnR3YXJlIEVuZ2luZWVyIHBvc2l0aW9uLg=="
+        }
+      },
+      "internalDate": "1738184400000"
+    },
+    {
+      "id": "edge_very_long_body",
+      "threadId": "thread_edge_18",
+      "labelIds": ["INBOX"],
+      "snippet": "Application with extremely detailed job description",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "recruiting@detailedcorp.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application Confirmation: Backend Engineer" },
+          { "name": "Date", "value": "Tue, 30 Jan 2026 11:30:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsgeW91IGZvciBhcHBseWluZyB0byBEZXRhaWxlZENvcnAgZm9yIHRoZSBCYWNrZW5kIEVuZ2luZWVyIHBvc2l0aW9uIGluIFNlYXR0bGUsIFdBLiBXZSBoYXZlIHJlY2VpdmVkIHlvdXIgYXBwbGljYXRpb24gYW5kIGFyZSBjdXJyZW50bHkgcmV2aWV3aW5nIGl0LiBUaGlzIHBvc2l0aW9uIHJlcXVpcmVzIGV4dGVuc2l2ZSBleHBlcmllbmNlIGluIGJhY2tlbmQgZGV2ZWxvcG1lbnQsIGluY2x1ZGluZyBidXQgbm90IGxpbWl0ZWQgdG86IE5vZGUuanMsIFB5dGhvbiwgR28sIEphdmEsIFBvc3RncmVTUUwsIE1vbmdvREIsIFJlZGlzLCBSYWJiaXRNUSwgS2Fma2EsIERvY2tlciwgS3ViZXJuZXRlcywgQVdTLCBHQ1AsIEF6dXJlLCBDSS9DRCBwaXBlbGluZXMsIG1pY3Jvc2VydmljZXMgYXJjaGl0ZWN0dXJlLCBBUEkgZGVzaWduLCBkYXRhYmFzZSBvcHRpbWl6YXRpb24sIHBlcmZvcm1hbmNlIHR1bmluZywgc2VjdXJpdHkgYmVzdCBwcmFjdGljZXMsIGFuZCBtdWNoIG1vcmUuIFdlIHdpbGwgYmUgaW4gdG91Y2ggd2l0aGluIDItMyBidXNpbmVzcyBkYXlzIHRvIGRpc2N1c3MgdGhlIG5leHQgc3RlcHMgaW4gdGhlIGludGVydmlldyBwcm9jZXNzLg=="
+        }
+      },
+      "internalDate": "1738279800000"
+    },
+    {
+      "id": "edge_multiple_companies",
+      "threadId": "thread_edge_19",
+      "labelIds": ["INBOX"],
+      "snippet": "Email mentioning multiple companies",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "recruiter@headhunter.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Opportunities at Google, Amazon, and Microsoft" },
+          { "name": "Date", "value": "Wed, 31 Jan 2026 14:00:00 -0800" }
+        ],
+        "body": {
+          "data": "SGkgdGhlcmUsIEkgaGF2ZSBzZXZlcmFsIG9wcG9ydHVuaXRpZXMgYXQgR29vZ2xlLCBBbWF6b24sIGFuZCBNaWNyb3NvZnQgdGhhdCBtaWdodCBpbnRlcmVzdCB5b3Uu"
+        }
+      },
+      "internalDate": "1738368000000"
+    },
+    {
+      "id": "edge_multiple_roles",
+      "threadId": "thread_edge_20",
+      "labelIds": ["INBOX"],
+      "snippet": "Email mentioning multiple job roles",
+      "payload": {
+        "headers": [
+          { "name": "From", "value": "jobs@flexiblecorp.com" },
+          { "name": "To", "value": "r.w.chen88@gmail.com" },
+          { "name": "Subject", "value": "Application: Software Engineer / DevOps Engineer / SRE" },
+          { "name": "Date", "value": "Thu, 1 Feb 2026 10:15:00 -0800" }
+        ],
+        "body": {
+          "data": "VGhhbmsgeW91IGZvciBhcHBseWluZyB0byBGbGV4aWJsZUNvcnAuIFdlJ3JlIGNvbnNpZGVyaW5nIHlvdSBmb3IgU29mdHdhcmUgRW5naW5lZXIsIERldk9wcyBFbmdpbmVlciwgb3IgU1JFIHJvbGVzLg=="
+        }
+      },
+      "internalDate": "1738441500000"
+    }
+  ]
+}

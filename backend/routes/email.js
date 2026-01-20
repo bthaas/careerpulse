@@ -18,10 +18,14 @@ router.post('/sync', async (req, res) => {
   try {
     const { maxResults = 100, afterDate = null } = req.body;
     
-    console.log('🔄 Starting email sync...');
+    console.log('🔄 Starting email sync for user:', req.user.userId);
     
     // Fetch job-related emails
-    const emails = await fetchJobEmails({ maxResults, afterDate });
+    const emails = await fetchJobEmails({ 
+      maxResults, 
+      afterDate,
+      userId: req.user.userId 
+    });
     console.log(`📧 Fetched ${emails.length} emails`);
     
     const results = {
@@ -37,7 +41,7 @@ router.post('/sync', async (req, res) => {
     for (const email of emails) {
       try {
         // Parse email to extract application data
-        const application = parseEmail(email);
+        const application = await parseEmail(email);
         
         if (!application) {
           // Not a job-related email
@@ -106,7 +110,7 @@ router.post('/sync', async (req, res) => {
  */
 router.get('/profile', async (req, res) => {
   try {
-    const profile = await getGmailProfile();
+    const profile = await getGmailProfile(req.user.userId);
     res.json(profile);
   } catch (error) {
     console.error('Error fetching profile:', error);
@@ -149,6 +153,43 @@ router.get('/status', async (req, res) => {
   } catch (error) {
     console.error('Error checking sync status:', error);
     res.status(500).json({ error: 'Failed to check sync status' });
+  }
+});
+
+/**
+ * GET /api/email/debug
+ * Debug endpoint to see raw Gmail data (first 5 emails)
+ */
+router.get('/debug', async (req, res) => {
+  try {
+    console.log('🔍 Fetching raw Gmail data for debugging...');
+    
+    // Fetch first 5 job-related emails
+    const emails = await fetchJobEmails({ 
+      maxResults: 5,
+      userId: req.user.userId 
+    });
+    
+    // Return raw email data
+    res.json({
+      count: emails.length,
+      emails: emails.map(email => ({
+        id: email.id,
+        from: email.from,
+        subject: email.subject,
+        date: email.date,
+        snippet: email.snippet,
+        bodyPreview: email.body.substring(0, 500) + '...',
+        bodyLength: email.body.length
+      }))
+    });
+    
+  } catch (error) {
+    console.error('Debug endpoint error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch debug data',
+      message: error.message 
+    });
   }
 });
 

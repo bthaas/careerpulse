@@ -8,9 +8,10 @@ import { getEmailConnection } from '../database/db.js';
 
 /**
  * Initialize Gmail client with stored credentials
+ * @param {string} userId - User ID to get connection for
  */
-async function initializeGmailClient() {
-  const connection = await getEmailConnection();
+async function initializeGmailClient(userId) {
+  const connection = await getEmailConnection(userId);
   
   if (!connection) {
     throw new Error('No Gmail connection found. Please connect your Gmail account first.');
@@ -32,17 +33,23 @@ async function initializeGmailClient() {
  * @param {string} options.query - Gmail search query
  * @param {number} options.maxResults - Maximum number of results (default: 50)
  * @param {string} options.afterDate - Fetch emails after this date (YYYY/MM/DD)
+ * @param {string} options.userId - User ID (required)
  * @returns {Array} Array of email objects
  */
 export async function fetchEmails(options = {}) {
   const {
     query = 'in:inbox',
     maxResults = 50,
-    afterDate = null
+    afterDate = null,
+    userId
   } = options;
   
+  if (!userId) {
+    throw new Error('userId is required');
+  }
+  
   try {
-    const gmail = await initializeGmailClient();
+    const gmail = await initializeGmailClient(userId);
     
     // Build search query
     let searchQuery = query;
@@ -88,25 +95,39 @@ export async function fetchEmails(options = {}) {
 
 /**
  * Search for job-related emails
+ * Stage 1: Cast wide net with Gmail query (broad keywords)
  * @param {Object} options - Search options
  * @returns {Array} Array of job-related emails
  */
 export async function fetchJobEmails(options = {}) {
+  const { userId, ...otherOptions } = options;
+  
+  if (!userId) {
+    throw new Error('userId is required');
+  }
+  
   const defaultOptions = {
-    query: '(application OR interview OR offer OR rejected OR "thank you for applying") in:inbox',
+    // Stage 1: Broad Gmail query to catch all potential job emails
+    query: '(application OR apply OR applied OR interview OR offer OR rejected OR rejection OR position OR role OR job OR career OR hiring OR recruit OR candidate OR "thank you for" OR "thanks for applying" OR congratulations OR schedule OR "phone screen" OR "video call" OR "next steps") in:inbox',
     maxResults: 100,
-    afterDate: options.afterDate || getDefaultAfterDate()
+    afterDate: otherOptions.afterDate || getDefaultAfterDate(),
+    userId
   };
   
-  return await fetchEmails({ ...defaultOptions, ...options });
+  return await fetchEmails({ ...defaultOptions, ...otherOptions });
 }
 
 /**
  * Get user's Gmail profile
+ * @param {string} userId - User ID
  */
-export async function getGmailProfile() {
+export async function getGmailProfile(userId) {
+  if (!userId) {
+    throw new Error('userId is required');
+  }
+  
   try {
-    const gmail = await initializeGmailClient();
+    const gmail = await initializeGmailClient(userId);
     
     const response = await gmail.users.getProfile({
       userId: 'me'
