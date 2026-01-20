@@ -169,9 +169,23 @@ router.get('/gmail/callback', async (req, res) => {
         const userInfo = await oauth2.userinfo.get();
         userEmail = userInfo.data.email;
         
-        // For now, use email as userId (this is a temporary workaround)
-        // In production, you'd look up the user in your database
-        userId = userEmail;
+        // Look up or create user in database
+        const { getUserByEmail, createUser } = await import('../database/db.js');
+        let user = await getUserByEmail(userEmail);
+        
+        if (!user) {
+          // Create new user for this email
+          console.log('📝 Creating new user for email:', userEmail);
+          userId = await createUser({
+            email: userEmail,
+            password: null, // OAuth user
+            name: userInfo.data.name || userEmail.split('@')[0]
+          });
+          console.log('✅ Created new user:', userId);
+        } else {
+          userId = user.id;
+          console.log('✅ Found existing user:', userId);
+        }
         
         console.log('✅ Retrieved email from OAuth:', userEmail);
       } catch (emailError) {
