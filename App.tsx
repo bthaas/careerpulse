@@ -188,8 +188,18 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         `width=${width},height=${height},left=${left},top=${top}`
       );
       
-      // Poll for connection status
+      // Poll for connection status (check every 3 seconds, max 10 attempts)
+      let pollAttempts = 0;
+      const maxAttempts = 10;
+      
       const checkConnection = setInterval(async () => {
+        pollAttempts++;
+        
+        if (pollAttempts > maxAttempts) {
+          clearInterval(checkConnection);
+          return;
+        }
+        
         try {
           const statusResponse = await fetch(`${api.API_URL}/api/auth/status`, {
             credentials: 'include',
@@ -208,10 +218,10 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         } catch (err) {
           // Continue polling
         }
-      }, 2000);
+      }, 3000); // Check every 3 seconds instead of 2
       
-      // Stop polling after 2 minutes
-      setTimeout(() => clearInterval(checkConnection), 120000);
+      // Stop polling after 30 seconds (10 attempts * 3 seconds)
+      setTimeout(() => clearInterval(checkConnection), 30000);
       
     } catch (err: any) {
       console.error('Error connecting Gmail:', err);

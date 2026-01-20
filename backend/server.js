@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3001;
 // Trust proxy - Required for Railway/production environments behind reverse proxies
 // This allows rate limiters and security features to work correctly
 if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', true);
+  app.set('trust proxy', 1); // Trust first proxy only (Railway)
 }
 
 // ====================
@@ -54,10 +54,10 @@ if (process.env.NODE_ENV === 'production') {
 // 3. Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 500, // Increased limit for production use
   message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
-  legacyHeaders: false, // Disable `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Apply rate limiting to all API routes
