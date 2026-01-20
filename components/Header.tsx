@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVI
                 title="Import from CSV"
               >
                 <span className="material-symbols-outlined text-[18px]">upload_file</span>
-                <span>Import CSV</span>
+                <span>Import Spreadsheet</span>
               </button>
             )}
 
