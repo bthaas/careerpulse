@@ -49,22 +49,44 @@ export function parseCSV(csvText) {
     throw new Error('CSV file must have at least a header row and one data row');
   }
   
-  // Parse header
-  const headerLine = lines[0];
-  const headers = parseCSVLine(headerLine);
-  const columnMap = mapColumns(headers);
+  // Find the header row (look for "Company" column)
+  let headerIndex = 0;
+  let headers = [];
+  let columnMap = {};
   
-  // Parse data rows
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    const testHeaders = parseCSVLine(lines[i]);
+    const testMap = mapColumns(testHeaders);
+    
+    // If we find Company and Position columns, this is the header row
+    if (testMap.company !== undefined && testMap.role !== undefined) {
+      headerIndex = i;
+      headers = testHeaders;
+      columnMap = testMap;
+      break;
+    }
+  }
+  
+  if (headers.length === 0) {
+    throw new Error('Could not find header row with Company and Position columns');
+  }
+  
+  // Parse data rows (start after header row)
   const applications = [];
-  for (let i = 1; i < lines.length; i++) {
+  for (let i = headerIndex + 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
     
-    if (values.length === 0 || values.every(v => !v.trim())) {
-      continue; // Skip empty rows
+    // Skip empty rows or rows with no data
+    if (values.length === 0 || values.every(v => !v || !v.trim())) {
+      continue;
     }
     
     const application = parseRow(headers, values, columnMap);
-    if (application.company && application.role) {
+    
+    // Only include rows with both company and role
+    if (application.company && application.company.trim() && 
+        application.role && application.role.trim() &&
+        application.company.toLowerCase() !== 'company') { // Skip header duplicates
       applications.push(application);
     }
   }
