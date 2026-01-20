@@ -154,7 +154,10 @@ Open **http://localhost:5173** in your browser!
 
 ## 📚 Documentation
 
+- **[QUICK_START.md](QUICK_START.md)** - Get started in 5 minutes! ⚡
 - **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Detailed setup instructions with screenshots
+- **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment guide
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
 - **[GEMINI_SETUP.md](backend/GEMINI_SETUP.md)** - Google AI API setup guide
 - **[LLM_PARSING_GUIDE.md](backend/services/LLM_PARSING_GUIDE.md)** - Email parsing documentation
 - **[GEMINI_IMPLEMENTATION_SUMMARY.md](GEMINI_IMPLEMENTATION_SUMMARY.md)** - LLM integration overview

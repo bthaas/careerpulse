@@ -14,7 +14,11 @@
     "test:e2e": "vitest run tests/e2e/",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
-    "setup-secrets": "node scripts/setup-secrets.js"
+    "test:gemini": "node test-gemini.js",
+    "test:oauth": "node test-oauth-url.js",
+    "test:all": "npm run test:gemini && npm run test:oauth && npm test",
+    "setup-secrets": "node scripts/setup-secrets.js",
+    "validate": "npm run test:gemini && npm run test:oauth && echo '✅ All validations passed!'"
   },
   "keywords": [
     "job-tracker",
