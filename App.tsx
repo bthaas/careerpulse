@@ -120,9 +120,17 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
       
       // Add to local state
       setApplications(prev => [created, ...prev]);
-    } catch (err) {
-      console.error('Error adding application:', err);
-      alert('Failed to add application. Please try again.');
+      
+      // Success notification
+      console.log('✅ Application added successfully:', created);
+    } catch (err: any) {
+      console.error('❌ Error adding application:', err);
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        response: err.response
+      });
+      alert(`Failed to add application: ${err.message || 'Please try again.'}`);
     }
   };
 
@@ -294,8 +302,8 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
       />
       
       <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col overflow-hidden">
-        {/* Top Stats */}
-        {applications.length > 0 && <StatsCards applications={applications} />}
+        {/* Top Stats - Always visible */}
+        <StatsCards applications={applications} />
 
         {/* List View or Empty State */}
         <div className="flex-1 overflow-hidden">

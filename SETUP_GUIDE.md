@@ -97,7 +97,7 @@ JWT_SECRET=your_random_jwt_secret_here_change_this
 
 # Session Secret (for session management)
 SESSION_SECRET=your_random_session_secret_here_change_this
-
+                              
 # Database
 DATABASE_PATH=./database/careerpulse.db
 ```
