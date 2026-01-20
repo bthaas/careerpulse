@@ -51,10 +51,53 @@ router.get('/gmail/callback', async (req, res) => {
       console.error('❌ Missing authorization code');
       return res.status(400).send(`
         <html>
+          <head>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              }
+              .container {
+                background: white;
+                padding: 3rem;
+                border-radius: 1rem;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                text-align: center;
+                max-width: 500px;
+              }
+              h1 { color: #ef4444; margin: 0 0 1rem 0; font-size: 2rem; }
+              p { color: #6b7280; margin: 0.5rem 0; line-height: 1.6; }
+              .icon { font-size: 4rem; margin-bottom: 1rem; }
+              .help { background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-top: 1.5rem; font-size: 0.875rem; color: #92400e; text-align: left; }
+              .help strong { display: block; margin-bottom: 0.5rem; }
+              .help ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+            </style>
+          </head>
           <body>
-            <h1>❌ Connection Failed</h1>
-            <p>Missing authorization code</p>
-            <p>Please try again.</p>
+            <div class="container">
+              <div class="icon">❌</div>
+              <h1>Connection Failed</h1>
+              <p>The authorization code is missing. This usually happens when:</p>
+              <div class="help">
+                <strong>Common Causes:</strong>
+                <ul>
+                  <li>You closed the authorization window too early</li>
+                  <li>You clicked "Cancel" or "Deny" in Google's consent screen</li>
+                  <li>The authorization request timed out</li>
+                </ul>
+                <strong>What to do:</strong>
+                <ul>
+                  <li>Close this window</li>
+                  <li>Try connecting Gmail again from CareerPulse</li>
+                  <li>Make sure to click "Allow" when Google asks for permissions</li>
+                </ul>
+              </div>
+            </div>
           </body>
         </html>
       `);
@@ -267,6 +310,7 @@ router.get('/status', authMiddleware, async (req, res) => {
     // If expired, try to refresh
     if (isExpired && connection.refreshToken) {
       try {
+        console.log('🔄 Refreshing expired token for user:', req.user.userId);
         const newTokens = await refreshAccessToken(connection.refreshToken);
         
         // Update tokens in database
@@ -278,18 +322,29 @@ router.get('/status', authMiddleware, async (req, res) => {
           expiresAt: new Date(newTokens.expiry_date).toISOString()
         });
         
+        console.log('✅ Token refreshed successfully');
+        
         return res.json({
           connected: true,
-          email: connection.email
+          email: connection.email,
+          refreshed: true
         });
       } catch (refreshError) {
-        console.error('Token refresh failed:', refreshError);
-        // Token refresh failed, user needs to reconnect
-        await disconnectEmail();
+        console.error('❌ Token refresh failed:', refreshError.message);
+        
+        // Token refresh failed, clean up and inform user
+        try {
+          await disconnectEmail(req.user.userId);
+          console.log('🧹 Cleaned up expired connection');
+        } catch (cleanupError) {
+          console.error('Failed to cleanup connection:', cleanupError);
+        }
+        
         return res.json({
           connected: false,
           email: null,
-          error: 'Token expired, please reconnect'
+          error: 'token_expired',
+          message: 'Your Gmail connection has expired. Please reconnect to continue syncing emails.'
         });
       }
     }
