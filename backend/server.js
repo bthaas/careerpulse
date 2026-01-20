@@ -17,6 +17,12 @@ let secrets = {};
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy - Required for Railway/production environments behind reverse proxies
+// This allows rate limiters and security features to work correctly
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', true);
+}
+
 // ====================
 // Security Middleware
 // ====================
