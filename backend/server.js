@@ -84,15 +84,10 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, Postman, curl)
-    // But only in development
-    if (!origin && process.env.NODE_ENV !== 'production') {
+    // Allow requests with no origin (like OAuth callbacks, mobile apps, Postman)
+    // OAuth redirects from Google don't include an Origin header
+    if (!origin) {
       return callback(null, true);
-    }
-    
-    // In production, require origin header
-    if (!origin && process.env.NODE_ENV === 'production') {
-      return callback(new Error('Not allowed by CORS - Origin header required'));
     }
     
     if (allowedOrigins.includes(origin)) {
