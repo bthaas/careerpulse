@@ -5,7 +5,9 @@ import {
   createApplication, 
   updateApplication, 
   deleteApplication,
-  getStatusHistory 
+  getStatusHistory,
+  getUserByEmail,
+  createUser
 } from '../database/db.js';
 import { authMiddleware } from '../utils/auth.js';
 import { parseCSV } from '../utils/csvParser.js';
@@ -227,6 +229,18 @@ router.post('/import/csv', async (req, res) => {
     
     if (!csvData) {
       return res.status(400).json({ error: 'CSV data is required' });
+    }
+    
+    // Ensure user exists in database (fix for missing user records)
+    const existingUser = await getUserByEmail(req.user.email);
+    if (!existingUser) {
+      // Create user from JWT token data
+      await createUser({
+        id: req.user.userId,
+        email: req.user.email,
+        password: null, // OAuth users don't have password
+        name: req.user.email.split('@')[0]
+      });
     }
     
     // Parse CSV
