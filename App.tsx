@@ -47,8 +47,8 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
   const [error, setError] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   
-  // Sort & Filter state
-  const [sortField, setSortField] = useState<SortField>('none');
+  // Sort & Filter state - Default to most recent first
+  const [sortField, setSortField] = useState<SortField>('dateApplied');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [dateRangeFilter, setDateRangeFilter] = useState<'all' | '7days' | '30days' | '90days'>('all');
