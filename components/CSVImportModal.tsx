@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import * as XLSX from 'xlsx';
 
 interface CSVImportModalProps {
   isOpen: boolean;
@@ -38,11 +39,17 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
     setIsDragging(false);
     
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.name.endsWith('.csv')) {
+    const isValidFile = droppedFile && (
+      droppedFile.name.endsWith('.csv') || 
+      droppedFile.name.endsWith('.xlsx') ||
+      droppedFile.name.endsWith('.xls')
+    );
+    
+    if (isValidFile) {
       setFile(droppedFile);
       setError(null);
     } else {
-      setError('Please drop a CSV file');
+      setError('Please drop a CSV or Excel (.xlsx) file');
     }
   };
 
@@ -61,8 +68,19 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
     setError(null);
 
     try {
-      // Read file content
-      const text = await file.text();
+      let csvText: string;
+      
+      // Check if file is Excel
+      if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        // Convert Excel to CSV
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        csvText = XLSX.utils.sheet_to_csv(firstSheet);
+      } else {
+        // Read CSV file as text
+        csvText = await file.text();
+      }
       
       // Send to backend
       const token = localStorage.getItem('auth_token');
@@ -73,7 +91,7 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
           'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
-        body: JSON.stringify({ csvData: text })
+        body: JSON.stringify({ csvData: csvText })
       });
 
       if (!response.ok) {
@@ -121,8 +139,8 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
                 <span className="material-symbols-outlined text-blue-500 text-2xl">upload_file</span>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Import from CSV</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Upload your job application spreadsheet</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Import Spreadsheet</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Upload CSV or Excel (.xlsx) file</p>
               </div>
             </div>
             <button
@@ -150,7 +168,7 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept=".csv,.xlsx,.xls"
                 onChange={handleFileSelect}
                 className="hidden"
               />
@@ -165,9 +183,9 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ isOpen, onClose, onImpo
                 <div className="flex flex-col items-center gap-2">
                   <span className="material-symbols-outlined text-slate-400 text-5xl">cloud_upload</span>
                   <p className="text-lg font-medium text-slate-900 dark:text-white">
-                    Drop your CSV file here
+                    Drop your CSV or Excel file here
                   </p>
-                  <p className="text-sm text-slate-500">or click to browse</p>
+                  <p className="text-sm text-slate-500">Supports .csv, .xlsx, .xls files</p>
                 </div>
               )}
             </div>
