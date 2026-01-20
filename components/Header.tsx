@@ -21,9 +21,11 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-9 bg-primary/10 rounded-lg text-primary">
-              <span className="material-symbols-outlined text-2xl">work</span>
-            </div>
+            <img 
+              src="/JobFetchLogo.png" 
+              alt="JobFetch Logo" 
+              className="size-9 object-contain"
+            />
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">JobFetch</h1>
           </div>
 
