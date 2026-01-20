@@ -8,6 +8,7 @@ import {
   getStatusHistory 
 } from '../database/db.js';
 import { authMiddleware } from '../utils/auth.js';
+import { parseCSV } from '../utils/csvParser.js';
 
 const router = express.Router();
 
@@ -213,6 +214,81 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting application:', error);
     res.status(500).json({ error: 'Failed to delete application' });
+  }
+});
+
+/**
+ * POST /api/applications/import/csv
+ * Import applications from CSV file
+ */
+router.post('/import/csv', async (req, res) => {
+  try {
+    const { csvData } = req.body;
+    
+    if (!csvData) {
+      return res.status(400).json({ error: 'CSV data is required' });
+    }
+    
+    // Parse CSV
+    const parsedApplications = parseCSV(csvData);
+    
+    if (parsedApplications.length === 0) {
+      return res.status(400).json({ error: 'No valid applications found in CSV' });
+    }
+    
+    // Create applications in database
+    const results = {
+      total: parsedApplications.length,
+      imported: 0,
+      skipped: 0,
+      errors: []
+    };
+    
+    for (const app of parsedApplications) {
+      try {
+        const now = new Date();
+        const application = {
+          id: `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          userId: req.user.userId,
+          company: app.company,
+          role: app.role,
+          location: app.location || 'Not specified',
+          dateApplied: app.dateApplied,
+          lastUpdate: now.toISOString().split('T')[0],
+          createdAt: now.toISOString(),
+          status: app.status,
+          source: app.source || 'CSV Import',
+          salary: app.salary || null,
+          remotePolicy: app.remotePolicy || null,
+          notes: app.notes || null,
+          emailId: null,
+          confidenceScore: 100, // Manual imports are 100% confidence
+          isDuplicate: 0
+        };
+        
+        await createApplication(application);
+        results.imported++;
+        
+        // Small delay to ensure unique IDs
+        await new Promise(resolve => setTimeout(resolve, 5));
+      } catch (error) {
+        console.error('Error importing application:', error);
+        results.skipped++;
+        results.errors.push({
+          company: app.company,
+          role: app.role,
+          error: error.message
+        });
+      }
+    }
+    
+    res.json(results);
+  } catch (error) {
+    console.error('Error importing CSV:', error);
+    res.status(500).json({ 
+      error: 'Failed to import CSV',
+      message: error.message 
+    });
   }
 });
 

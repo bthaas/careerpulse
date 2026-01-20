@@ -4,6 +4,7 @@ interface HeaderProps {
   toggleTheme: () => void;
   isDark: boolean;
   onAddClick: () => void;
+  onCSVImportClick?: () => void;
   searchQuery: string;
   onSearch: (query: string) => void;
   onSyncEmails?: () => void;
@@ -12,7 +13,7 @@ interface HeaderProps {
   user?: { name?: string; email?: string };
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout, user }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVImportClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout, user }) => {
   const [showUserMenu, setShowUserMenu] = React.useState(false);
   
   return (
@@ -54,6 +55,17 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
               <span className="material-symbols-outlined text-[18px]">add</span>
               <span>Add Application</span>
             </button>
+
+            {onCSVImportClick && (
+              <button 
+                onClick={onCSVImportClick}
+                className="hidden sm:flex items-center gap-2 h-9 px-4 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                title="Import from CSV"
+              >
+                <span className="material-symbols-outlined text-[18px]">upload_file</span>
+                <span>Import CSV</span>
+              </button>
+            )}
 
             <button 
               onClick={onSyncEmails}

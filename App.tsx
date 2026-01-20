@@ -4,6 +4,7 @@ import StatsCards from './components/StatsCards';
 import ApplicationsTable from './components/ApplicationsTable';
 import ApplicationDrawer from './components/ApplicationDrawer';
 import AddApplicationModal, { NewApplication } from './components/AddApplicationModal';
+import CSVImportModal, { ImportResults } from './components/CSVImportModal';
 import EmptyState from './components/EmptyState';
 import LoginSignup from './components/LoginSignup';
 import { Application } from './types';
@@ -40,6 +41,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -229,6 +231,20 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
     }
   };
 
+  const handleCSVImport = async (results: ImportResults) => {
+    // Refresh applications list
+    await fetchApplications();
+    
+    // Show results
+    const message = `✅ CSV Import Complete!\n\n` +
+      `Total rows: ${results.total}\n` +
+      `Imported: ${results.imported}\n` +
+      `Skipped: ${results.skipped}` +
+      (results.errors.length > 0 ? `\n\nErrors:\n${results.errors.map(e => `• ${e.company} - ${e.role}: ${e.error}`).join('\n')}` : '');
+    
+    alert(message);
+  };
+
   const getSourceIcon = (source: string): string => {
     const iconMap: Record<string, string> = {
       'LinkedIn': 'work',
@@ -365,6 +381,7 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         toggleTheme={toggleTheme} 
         isDark={isDark} 
         onAddClick={() => setIsAddModalOpen(true)}
+        onCSVImportClick={() => setIsCSVImportOpen(true)}
         searchQuery={searchQuery}
         onSearch={handleSearch}
         onSyncEmails={handleSyncEmails}
@@ -411,6 +428,12 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddApplication}
+      />
+
+      <CSVImportModal
+        isOpen={isCSVImportOpen}
+        onClose={() => setIsCSVImportOpen(false)}
+        onImport={handleCSVImport}
       />
     </div>
   );
