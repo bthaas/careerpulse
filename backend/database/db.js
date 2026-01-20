@@ -194,10 +194,12 @@ export async function findDuplicateApplication(userId, company, role, dateApplie
  * Create a new user
  */
 export async function createUser(user) {
-  return await dbRun(`
+  const userId = user.id || `user-${Date.now()}`;
+  await dbRun(`
     INSERT INTO users (id, email, password, name)
     VALUES (?, ?, ?, ?)
-  `, [user.id, user.email, user.password, user.name]);
+  `, [userId, user.email, user.password, user.name]);
+  return userId;
 }
 
 /**

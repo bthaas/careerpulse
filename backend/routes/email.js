@@ -20,6 +20,18 @@ router.post('/sync', async (req, res) => {
     
     console.log('🔄 Starting email sync for user:', req.user.userId);
     
+    // Verify user exists in database
+    const { getUserById } = await import('../database/db.js');
+    const user = await getUserById(req.user.userId);
+    
+    if (!user) {
+      console.error('❌ User not found in database:', req.user.userId);
+      return res.status(404).json({ 
+        error: 'User not found',
+        message: 'Your user account was not found. Please log out and log in again.'
+      });
+    }
+    
     // Fetch job-related emails
     const emails = await fetchJobEmails({ 
       maxResults, 
@@ -76,6 +88,12 @@ router.post('/sync', async (req, res) => {
         
       } catch (error) {
         console.error('Error processing email:', error);
+        console.error('Email details:', {
+          emailId: email.id,
+          from: email.from,
+          subject: email.subject,
+          userId: req.user.userId
+        });
         results.errors++;
       }
     }
