@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, search
           {/* Logo */}
           <div className="flex items-center gap-3">
             <img 
-              src="/JobFetchLogo.png" 
+              src="/JobFetchLogo2.png" 
               alt="JobFetch Logo" 
               className="size-9 object-contain"
             />
