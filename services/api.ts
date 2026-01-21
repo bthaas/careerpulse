@@ -170,10 +170,24 @@ export interface SyncResult {
 }
 
 export async function syncEmails(options?: { maxResults?: number; afterDate?: string }): Promise<SyncResult> {
-  return apiRequest<SyncResult>('/email/sync', {
-    method: 'POST',
-    body: JSON.stringify(options || {}),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+  
+  try {
+    const result = await apiRequest<SyncResult>('/email/sync', {
+      method: 'POST',
+      body: JSON.stringify(options || {}),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return result;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Sync is taking longer than expected. Please check your applications list - some may have been added.');
+    }
+    throw error;
+  }
 }
 
 export async function getEmailProfile(): Promise<{ email: string; messagesTotal: number; threadsTotal: number }> {

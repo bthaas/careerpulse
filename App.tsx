@@ -148,12 +148,18 @@ const Dashboard: React.FC<{ logout: () => void; user: { id: string; email: strin
     } catch (err: any) {
       console.error('Error syncing emails:', err);
       
+      // Refresh applications anyway - some might have been added
+      await fetchApplications();
+      
       if (err.message.includes('Gmail not connected') || err.message.includes('No Gmail connection')) {
         // Automatically trigger connect flow
         const shouldConnect = confirm('Gmail is not connected. Would you like to connect now?');
         if (shouldConnect) {
           await handleConnectGmail();
         }
+      } else if (err.message.includes('taking longer than expected')) {
+        // Timeout - but data might have been synced
+        alert(`⚠️ ${err.message}\n\nRefreshing your applications list...`);
       } else {
         alert(`Failed to sync emails: ${err.message}`);
       }
