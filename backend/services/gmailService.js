@@ -355,7 +355,6 @@ export class GmailService {
 
 // Create singleton instance for backward compatibility
 // This avoids circular dependency with container.js
-import { google } from 'googleapis';
 import { DatabaseService } from './DatabaseService.js';
 import dotenv from 'dotenv';
 
