@@ -6,10 +6,10 @@
  */
 
 import { DatabaseService } from './DatabaseService.js';
-import { GmailService } from './GmailService.js';
-import { LLMParser } from './LLMParser.js';
-import { EmailParser } from './EmailParser.js';
-import { DuplicateDetector } from './DuplicateDetector.js';
+import { GmailService } from './gmailService.js';
+import { LLMParser } from './llmParser.js';
+import { EmailParser } from './emailParser.js';
+import { DuplicateDetector } from './duplicateDetector.js';
 import { AuthService } from './AuthService.js';
 import { FileParserService } from './FileParserService.js';
 import { google } from 'googleapis';
