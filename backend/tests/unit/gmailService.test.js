@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { GmailService, GmailAPIError } from '../../services/GmailService.js';
+import { GmailService, GmailAPIError } from '../../services/gmailService.js';
 
 describe('GmailService Unit Tests', () => {
   let gmailService;

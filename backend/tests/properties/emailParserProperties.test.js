@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fc from 'fast-check';
-import { EmailParser } from '../../services/EmailParser.js';
+import { EmailParser } from '../../services/emailParser.js';
 
 describe('EmailParser Properties', () => {
   let emailParser;

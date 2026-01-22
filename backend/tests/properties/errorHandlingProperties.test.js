@@ -9,8 +9,8 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fc from 'fast-check';
 import { DatabaseService } from '../../services/DatabaseService.js';
-import { LLMParser } from '../../services/LLMParser.js';
-import { EmailParser } from '../../services/EmailParser.js';
+import { LLMParser } from '../../services/llmParser.js';
+import { EmailParser } from '../../services/emailParser.js';
 import { AuthService } from '../../services/AuthService.js';
 import { FileParserService } from '../../services/FileParserService.js';
 

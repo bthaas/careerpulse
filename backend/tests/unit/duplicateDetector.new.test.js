@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DuplicateDetector } from '../../services/DuplicateDetector.js';
+import { DuplicateDetector } from '../../services/duplicateDetector.js';
 
 describe('DuplicateDetector Unit Tests', () => {
   let duplicateDetector;

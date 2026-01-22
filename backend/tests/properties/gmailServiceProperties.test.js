@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fc from 'fast-check';
-import { GmailService, GmailAPIError } from '../../services/GmailService.js';
+import { GmailService, GmailAPIError } from '../../services/gmailService.js';
 
 describe('GmailService Properties', () => {
   let gmailService;

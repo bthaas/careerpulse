@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { LLMParser } from '../../services/LLMParser.js';
+import { LLMParser } from '../../services/llmParser.js';
 
 describe('LLMParser Unit Tests', () => {
   let llmParser;

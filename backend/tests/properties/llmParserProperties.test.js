@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fc from 'fast-check';
-import { LLMParser } from '../../services/LLMParser.js';
+import { LLMParser } from '../../services/llmParser.js';
 
 describe('LLMParser Properties', () => {
   let llmParser;

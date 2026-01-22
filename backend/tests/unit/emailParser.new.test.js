@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { EmailParser } from '../../services/EmailParser.js';
+import { EmailParser } from '../../services/emailParser.js';
 
 describe('EmailParser Unit Tests', () => {
   let emailParser;

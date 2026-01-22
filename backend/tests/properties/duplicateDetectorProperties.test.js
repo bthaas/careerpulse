@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fc from 'fast-check';
-import { DuplicateDetector } from '../../services/DuplicateDetector.js';
+import { DuplicateDetector } from '../../services/duplicateDetector.js';
 
 describe('DuplicateDetector Properties', () => {
   let duplicateDetector;
