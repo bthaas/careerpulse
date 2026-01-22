@@ -1,93 +1,82 @@
 /**
- * Authentication utilities
+ * Authentication utilities - Backward compatible wrapper for AuthService
+ * This file maintains the original functional API while using the new OOP implementation
  */
 
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import { AuthService } from '../services/AuthService.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days
-const SALT_ROUNDS = 10;
+
+// Create singleton instance
+const authService = new AuthService(JWT_SECRET, {
+  expiresIn: '7d',
+  saltRounds: 10
+});
+
+// ==========================================
+// Backward Compatible Function Exports
+// ==========================================
 
 /**
  * Hash a password
+ * @param {string} password - Plain text password
+ * @returns {Promise<string>} Hashed password
  */
 export async function hashPassword(password) {
-  return await bcrypt.hash(password, SALT_ROUNDS);
+  return await authService.hashPassword(password);
 }
 
 /**
  * Compare password with hash
+ * @param {string} password - Plain text password
+ * @param {string} hash - Hashed password
+ * @returns {Promise<boolean>} True if password matches
  */
 export async function comparePassword(password, hash) {
-  return await bcrypt.compare(password, hash);
+  return await authService.comparePassword(password, hash);
 }
 
 /**
  * Generate JWT token
+ * @param {string} userId - User ID
+ * @param {string} email - User email
+ * @returns {string} JWT token
  */
 export function generateToken(userId, email) {
-  return jwt.sign(
-    { userId, email },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  return authService.generateToken({ userId, email });
 }
 
 /**
  * Verify JWT token
+ * @param {string} token - JWT token
+ * @returns {Object|null} Decoded payload or null if invalid
  */
 export function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
+  return authService.verifyToken(token);
 }
 
 /**
  * Auth middleware - protects routes
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ * @param {Function} next - Express next function
  */
 export function authMiddleware(req, res, next) {
-  // Get token from Authorization header or cookie
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ') 
-    ? authHeader.substring(7) 
-    : req.cookies?.token;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-
-  const decoded = verifyToken(token);
-  
-  if (!decoded) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
-  }
-
-  // Add user info to request
-  req.user = decoded;
-  next();
+  return authService.authMiddleware(req, res, next);
 }
 
 /**
  * Optional auth middleware - doesn't require auth but adds user if present
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ * @param {Function} next - Express next function
  */
 export function optionalAuthMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ') 
-    ? authHeader.substring(7) 
-    : req.cookies?.token;
-
-  if (token) {
-    const decoded = verifyToken(token);
-    if (decoded) {
-      req.user = decoded;
-    }
-  }
-
-  next();
+  return authService.optionalAuthMiddleware(req, res, next);
 }
+
+// Export the service instance for direct access
+export { authService };
 
 export default {
   hashPassword,

@@ -11,36 +11,42 @@ import express from 'express';
 import request from 'supertest';
 import { TestDatabaseManager } from '../helpers/testSetup.js';
 
-// Mock the auth middleware BEFORE importing routes
-vi.mock('../../utils/auth.js', () => ({
+// Mock the container services
+const mockAuthService = {
   authMiddleware: (req, res, next) => {
-    req.user = { userId: 'test-user-123' };
+    req.user = { userId: 'test-user-123', email: 'test@example.com' };
     next();
   }
-}));
+};
 
-// Mock the services
-vi.mock('../../services/gmailService.js', () => ({
+const mockGmailService = {
   fetchJobEmails: vi.fn(),
   getGmailProfile: vi.fn()
-}));
+};
 
-vi.mock('../../services/emailParser.js', () => ({
+const mockEmailParser = {
   parseEmail: vi.fn()
-}));
+};
 
-vi.mock('../../services/duplicateDetector.js', () => ({
+const mockDuplicateDetector = {
   checkDuplicate: vi.fn()
-}));
+};
 
-vi.mock('../../database/db.js', async () => {
-  const actual = await vi.importActual('../../database/db.js');
-  return {
-    ...actual,
-    createApplication: vi.fn(),
-    getEmailConnection: vi.fn()
-  };
-});
+const mockDatabaseService = {
+  createApplication: vi.fn(),
+  getEmailConnection: vi.fn(),
+  getUserById: vi.fn()
+};
+
+vi.mock('../../services/container.js', () => ({
+  default: {
+    authService: mockAuthService,
+    gmailService: mockGmailService,
+    emailParser: mockEmailParser,
+    duplicateDetector: mockDuplicateDetector,
+    databaseService: mockDatabaseService
+  }
+}));
 
 // Import routes AFTER mocking
 const emailRoutes = await import('../../routes/email.js').then(m => m.default);
@@ -58,23 +64,26 @@ describe('Email Routes Integration Tests', () => {
     // Set up test database
     dbManager = new TestDatabaseManager();
     await dbManager.initialize();
+    
+    // Reset mocks
+    vi.clearAllMocks();
+    
+    // Default mock for getUserById
+    mockDatabaseService.getUserById.mockResolvedValue({
+      id: 'test-user-123',
+      email: 'test@example.com'
+    });
   });
 
   afterEach(async () => {
     if (dbManager) {
       await dbManager.teardown();
     }
-    vi.clearAllMocks();
   });
 
   describe('POST /api/email/sync', () => {
     it('should sync emails and return statistics', async () => {
       // Requirements: 9.1
-      const { fetchJobEmails } = await import('../../services/gmailService.js');
-      const { parseEmail } = await import('../../services/emailParser.js');
-      const { checkDuplicate } = await import('../../services/duplicateDetector.js');
-      const { createApplication } = await import('../../database/db.js');
-
       // Mock email data
       const mockEmails = [
         {
@@ -94,10 +103,10 @@ describe('Email Routes Integration Tests', () => {
         confidenceScore: 85
       };
 
-      fetchJobEmails.mockResolvedValue(mockEmails);
-      parseEmail.mockReturnValue(mockApplication);
-      checkDuplicate.mockResolvedValue({ isDuplicate: false });
-      createApplication.mockResolvedValue({ id: 'app1' });
+      mockGmailService.fetchJobEmails.mockResolvedValue(mockEmails);
+      mockEmailParser.parseEmail.mockReturnValue(mockApplication);
+      mockDuplicateDetector.checkDuplicate.mockResolvedValue({ isDuplicate: false });
+      mockDatabaseService.createApplication.mockResolvedValue({ id: 'app1' });
 
       const response = await request(app)
         .post('/api/email/sync')
@@ -113,9 +122,7 @@ describe('Email Routes Integration Tests', () => {
 
     it('should handle Gmail not connected error', async () => {
       // Requirements: 6.6
-      const { fetchJobEmails } = await import('../../services/gmailService.js');
-      
-      fetchJobEmails.mockRejectedValue(new Error('No Gmail connection found'));
+      mockGmailService.fetchJobEmails.mockRejectedValue(new Error('No Gmail connection found'));
 
       const response = await request(app)
         .post('/api/email/sync')
@@ -126,16 +133,12 @@ describe('Email Routes Integration Tests', () => {
     });
 
     it('should skip duplicate applications', async () => {
-      const { fetchJobEmails } = await import('../../services/gmailService.js');
-      const { parseEmail } = await import('../../services/emailParser.js');
-      const { checkDuplicate } = await import('../../services/duplicateDetector.js');
-
       const mockEmails = [{ id: 'email1', from: 'jobs@company.com' }];
       const mockApplication = { company: 'TechCorp', role: 'Engineer' };
 
-      fetchJobEmails.mockResolvedValue(mockEmails);
-      parseEmail.mockReturnValue(mockApplication);
-      checkDuplicate.mockResolvedValue({ isDuplicate: true });
+      mockGmailService.fetchJobEmails.mockResolvedValue(mockEmails);
+      mockEmailParser.parseEmail.mockReturnValue(mockApplication);
+      mockDuplicateDetector.checkDuplicate.mockResolvedValue({ isDuplicate: true });
 
       const response = await request(app)
         .post('/api/email/sync')
@@ -147,13 +150,10 @@ describe('Email Routes Integration Tests', () => {
     });
 
     it('should handle parsing errors gracefully', async () => {
-      const { fetchJobEmails } = await import('../../services/gmailService.js');
-      const { parseEmail } = await import('../../services/emailParser.js');
-
       const mockEmails = [{ id: 'email1' }];
 
-      fetchJobEmails.mockResolvedValue(mockEmails);
-      parseEmail.mockImplementation(() => {
+      mockGmailService.fetchJobEmails.mockResolvedValue(mockEmails);
+      mockEmailParser.parseEmail.mockImplementation(() => {
         throw new Error('Parsing failed');
       });
 
@@ -169,15 +169,13 @@ describe('Email Routes Integration Tests', () => {
   describe('GET /api/email/profile', () => {
     it('should return Gmail profile information', async () => {
       // Requirements: 9.2
-      const { getGmailProfile } = await import('../../services/gmailService.js');
-
       const mockProfile = {
         email: 'test@gmail.com',
         messagesTotal: 1000,
         threadsTotal: 500
       };
 
-      getGmailProfile.mockResolvedValue(mockProfile);
+      mockGmailService.getGmailProfile.mockResolvedValue(mockProfile);
 
       const response = await request(app)
         .get('/api/email/profile')
@@ -189,9 +187,7 @@ describe('Email Routes Integration Tests', () => {
 
     it('should return 401 when Gmail not connected', async () => {
       // Requirements: 6.6
-      const { getGmailProfile } = await import('../../services/gmailService.js');
-
-      getGmailProfile.mockRejectedValue(new Error('No Gmail connection found'));
+      mockGmailService.getGmailProfile.mockRejectedValue(new Error('No Gmail connection found'));
 
       const response = await request(app)
         .get('/api/email/profile')
@@ -204,14 +200,12 @@ describe('Email Routes Integration Tests', () => {
   describe('GET /api/email/status', () => {
     it('should return connection status when connected', async () => {
       // Requirements: 9.3
-      const { getEmailConnection } = await import('../../database/db.js');
-
       const mockConnection = {
         email: 'test@gmail.com',
         updated_at: '2024-01-15T10:00:00Z'
       };
 
-      getEmailConnection.mockResolvedValue(mockConnection);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(mockConnection);
 
       const response = await request(app)
         .get('/api/email/status')
@@ -222,9 +216,7 @@ describe('Email Routes Integration Tests', () => {
     });
 
     it('should return not connected when no connection exists', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-
-      getEmailConnection.mockResolvedValue(null);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(null);
 
       const response = await request(app)
         .get('/api/email/status')
@@ -241,6 +233,8 @@ describe('Email Routes Integration Tests', () => {
       // This test verifies that the auth middleware is applied
       // In our mocked version, it always succeeds
       // In production, it would check for valid JWT tokens
+      
+      mockGmailService.fetchJobEmails.mockResolvedValue([]);
       
       const response = await request(app)
         .post('/api/email/sync')

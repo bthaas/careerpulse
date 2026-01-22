@@ -1,8 +1,10 @@
 import express from 'express';
-import { createUser, getUserByEmail, getUserById } from '../database/db.js';
-import { hashPassword, comparePassword, generateToken, authMiddleware } from '../utils/auth.js';
+import container from '../services/container.js';
 
 const router = express.Router();
+
+// Get services from container
+const { databaseService, authService } = container;
 
 /**
  * POST /api/user/signup
@@ -22,17 +24,17 @@ router.post('/signup', async (req, res) => {
     }
     
     // Check if user already exists
-    const existingUser = await getUserByEmail(email.toLowerCase());
+    const existingUser = await databaseService.getUserByEmail(email.toLowerCase());
     if (existingUser) {
       return res.status(409).json({ error: 'Email already registered' });
     }
     
     // Hash password
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await authService.hashPassword(password);
     
     // Create user
     const userId = `user-${Date.now()}`;
-    await createUser({
+    await databaseService.createUser({
       id: userId,
       email: email.toLowerCase(),
       password: hashedPassword,
@@ -40,7 +42,7 @@ router.post('/signup', async (req, res) => {
     });
     
     // Generate token
-    const token = generateToken(userId, email.toLowerCase());
+    const token = authService.generateToken(userId, email.toLowerCase());
     
     res.status(201).json({
       success: true,
@@ -71,7 +73,7 @@ router.post('/login', async (req, res) => {
     }
     
     // Find user
-    const user = await getUserByEmail(email.toLowerCase());
+    const user = await databaseService.getUserByEmail(email.toLowerCase());
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -82,13 +84,13 @@ router.post('/login', async (req, res) => {
     }
     
     // Check password
-    const isValid = await comparePassword(password, user.password);
+    const isValid = await authService.comparePassword(password, user.password);
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
     // Generate token
-    const token = generateToken(user.id, user.email);
+    const token = authService.generateToken(user.id, user.email);
     
     res.json({
       success: true,
@@ -109,9 +111,9 @@ router.post('/login', async (req, res) => {
  * GET /api/user/me
  * Get current user info (protected route)
  */
-router.get('/me', authMiddleware, async (req, res) => {
+router.get('/me', (req, res, next) => authService.authMiddleware(req, res, next), async (req, res) => {
   try {
-    const user = await getUserById(req.user.id);
+    const user = await databaseService.getUserById(req.user.id);
     
     if (!user) {
       return res.status(404).json({ error: 'User not found' });

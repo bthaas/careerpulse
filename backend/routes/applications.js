@@ -1,21 +1,14 @@
 import express from 'express';
-import { 
-  getAllApplications, 
-  getApplicationById, 
-  createApplication, 
-  updateApplication, 
-  deleteApplication,
-  getStatusHistory,
-  getUserByEmail,
-  createUser
-} from '../database/db.js';
-import { authMiddleware } from '../utils/auth.js';
+import container from '../services/container.js';
 import { parseCSV } from '../utils/csvParser.js';
 
 const router = express.Router();
 
+// Get services from container
+const { databaseService, authService } = container;
+
 // Protect all routes with authentication
-router.use(authMiddleware);
+router.use((req, res, next) => authService.authMiddleware(req, res, next));
 
 /**
  * GET /api/applications
@@ -23,7 +16,7 @@ router.use(authMiddleware);
  */
 router.get('/', async (req, res) => {
   try {
-    const applications = await getAllApplications(req.user.userId);
+    const applications = await databaseService.getAllApplications(req.user.userId);
     res.json(applications);
   } catch (error) {
     console.error('Error fetching applications:', error);
@@ -38,7 +31,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id/history', async (req, res) => {
   try {
-    const history = await getStatusHistory(req.params.id);
+    const history = await databaseService.getStatusHistory(req.params.id);
     res.json(history);
   } catch (error) {
     console.error('Error fetching status history:', error);
@@ -52,7 +45,7 @@ router.get('/:id/history', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const application = await getApplicationById(req.params.id, req.user.userId);
+    const application = await databaseService.getApplicationById(req.params.id, req.user.userId);
     
     if (!application) {
       return res.status(404).json({ error: 'Application not found' });
@@ -103,10 +96,10 @@ router.post('/', async (req, res) => {
       isDuplicate: 0
     };
     
-    await createApplication(application);
+    await databaseService.createApplication(application);
     
     // Return the created application
-    const created = await getApplicationById(id, req.user.userId);
+    const created = await databaseService.getApplicationById(id, req.user.userId);
     res.status(201).json(created);
   } catch (error) {
     console.error('Error creating application:', error);
@@ -129,7 +122,7 @@ router.put('/:id', async (req, res) => {
     const updates = req.body;
     
     // Check if application exists and belongs to user
-    const existing = await getApplicationById(id, req.user.userId);
+    const existing = await databaseService.getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
@@ -145,10 +138,10 @@ router.put('/:id', async (req, res) => {
     // Update lastUpdate timestamp
     updates.lastUpdate = new Date().toISOString().split('T')[0];
     
-    await updateApplication(id, req.user.userId, updates);
+    await databaseService.updateApplication(id, req.user.userId, updates);
     
     // Return updated application
-    const updated = await getApplicationById(id, req.user.userId);
+    const updated = await databaseService.getApplicationById(id, req.user.userId);
     res.json(updated);
   } catch (error) {
     console.error('Error updating application:', error);
@@ -176,19 +169,19 @@ router.patch('/:id/status', async (req, res) => {
     }
     
     // Check if application exists and belongs to user
-    const existing = await getApplicationById(id, req.user.userId);
+    const existing = await databaseService.getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
     
     // Update status and lastUpdate
-    await updateApplication(id, req.user.userId, { 
+    await databaseService.updateApplication(id, req.user.userId, { 
       status, 
       lastUpdate: new Date().toISOString().split('T')[0] 
     });
     
     // Return updated application
-    const updated = await getApplicationById(id, req.user.userId);
+    const updated = await databaseService.getApplicationById(id, req.user.userId);
     res.json(updated);
   } catch (error) {
     console.error('Error updating application status:', error);
@@ -205,12 +198,12 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     
     // Check if application exists and belongs to user
-    const existing = await getApplicationById(id, req.user.userId);
+    const existing = await databaseService.getApplicationById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
     }
     
-    await deleteApplication(id, req.user.userId);
+    await databaseService.deleteApplication(id, req.user.userId);
     
     res.status(204).send();
   } catch (error) {
@@ -232,10 +225,10 @@ router.post('/import/csv', async (req, res) => {
     }
     
     // Ensure user exists in database (fix for missing user records)
-    const existingUser = await getUserByEmail(req.user.email);
+    const existingUser = await databaseService.getUserByEmail(req.user.email);
     if (!existingUser) {
       // Create user from JWT token data
-      await createUser({
+      await databaseService.createUser({
         id: req.user.userId,
         email: req.user.email,
         password: null, // OAuth users don't have password
@@ -280,7 +273,7 @@ router.post('/import/csv', async (req, res) => {
           isDuplicate: 0
         };
         
-        await createApplication(application);
+        await databaseService.createApplication(application);
         results.imported++;
         
         // Small delay to ensure unique IDs

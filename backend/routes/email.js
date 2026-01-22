@@ -1,14 +1,13 @@
 import express from 'express';
-import { fetchJobEmails, getGmailProfile } from '../services/gmailService.js';
-import { parseEmail } from '../services/emailParser.js';
-import { checkDuplicate } from '../services/duplicateDetector.js';
-import { createApplication } from '../database/db.js';
-import { authMiddleware } from '../utils/auth.js';
+import container from '../services/container.js';
 
 const router = express.Router();
 
+// Get services from container
+const { gmailService, emailParser, duplicateDetector, databaseService, authService } = container;
+
 // Protect all routes with authentication
-router.use(authMiddleware);
+router.use((req, res, next) => authService.authMiddleware(req, res, next));
 
 /**
  * POST /api/email/sync
@@ -21,8 +20,7 @@ router.post('/sync', async (req, res) => {
     console.log('🔄 Starting email sync for user:', req.user.userId);
     
     // Verify user exists in database
-    const { getUserById } = await import('../database/db.js');
-    const user = await getUserById(req.user.userId);
+    const user = await databaseService.getUserById(req.user.userId);
     
     if (!user) {
       console.error('❌ User not found in database:', req.user.userId);
@@ -33,7 +31,7 @@ router.post('/sync', async (req, res) => {
     }
     
     // Fetch job-related emails
-    const emails = await fetchJobEmails({ 
+    const emails = await gmailService.fetchJobEmails({ 
       maxResults, 
       afterDate,
       userId: req.user.userId 
@@ -53,7 +51,7 @@ router.post('/sync', async (req, res) => {
     for (const email of emails) {
       try {
         // Parse email to extract application data
-        const application = await parseEmail(email);
+        const application = await emailParser.parseEmail(email);
         
         if (!application) {
           // Not a job-related email
@@ -66,7 +64,7 @@ router.post('/sync', async (req, res) => {
         application.userId = req.user.userId;
         
         // Check for duplicates
-        const duplicateCheck = await checkDuplicate(application);
+        const duplicateCheck = await duplicateDetector.checkDuplicate(application);
         
         if (duplicateCheck.isDuplicate) {
           console.log(`⚠️  Duplicate found: ${application.company} - ${application.role}`);
@@ -75,7 +73,7 @@ router.post('/sync', async (req, res) => {
         }
         
         // Save to database
-        await createApplication(application);
+        await databaseService.createApplication(application);
         
         console.log(`✅ Added: ${application.company} - ${application.role} (confidence: ${application.confidenceScore}%)`);
         results.newApplications++;
@@ -128,7 +126,7 @@ router.post('/sync', async (req, res) => {
  */
 router.get('/profile', async (req, res) => {
   try {
-    const profile = await getGmailProfile(req.user.userId);
+    const profile = await gmailService.getGmailProfile(req.user.userId);
     res.json(profile);
   } catch (error) {
     console.error('Error fetching profile:', error);
@@ -153,8 +151,7 @@ router.get('/profile', async (req, res) => {
 router.get('/status', async (req, res) => {
   try {
     // Check if Gmail is connected
-    const { getEmailConnection } = await import('../database/db.js');
-    const connection = await getEmailConnection();
+    const connection = await databaseService.getEmailConnection();
     
     if (!connection) {
       return res.json({
@@ -183,7 +180,7 @@ router.get('/debug', async (req, res) => {
     console.log('🔍 Fetching raw Gmail data for debugging...');
     
     // Fetch first 5 job-related emails
-    const emails = await fetchJobEmails({ 
+    const emails = await gmailService.fetchJobEmails({ 
       maxResults: 5,
       userId: req.user.userId 
     });

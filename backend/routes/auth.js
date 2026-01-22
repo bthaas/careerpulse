@@ -5,21 +5,19 @@ import {
   refreshAccessToken,
   oauth2Client 
 } from '../config/gmail.js';
-import {
-  saveEmailConnection,
-  getEmailConnection,
-  disconnectEmail
-} from '../database/db.js';
-import { authMiddleware } from '../utils/auth.js';
+import container from '../services/container.js';
 import { generateOAuthState, validateOAuthState } from '../utils/oauthState.js';
 
 const router = express.Router();
+
+// Get services from container
+const { databaseService, authService } = container;
 
 /**
  * GET /api/auth/gmail
  * Initiate Gmail OAuth flow (protected route)
  */
-router.get('/gmail', authMiddleware, (req, res) => {
+router.get('/gmail', (req, res, next) => authService.authMiddleware(req, res, next), (req, res) => {
   try {
     // Generate OAuth state with user context
     const state = generateOAuthState(req.user.userId, req.user.email);
@@ -170,13 +168,12 @@ router.get('/gmail/callback', async (req, res) => {
         userEmail = userInfo.data.email;
         
         // Look up or create user in database
-        const { getUserByEmail, createUser } = await import('../database/db.js');
-        let user = await getUserByEmail(userEmail);
+        let user = await databaseService.getUserByEmail(userEmail);
         
         if (!user) {
           // Create new user for this email
           console.log('📝 Creating new user for email:', userEmail);
-          userId = await createUser({
+          userId = await databaseService.createUser({
             email: userEmail,
             password: null, // OAuth user
             name: userInfo.data.name || userEmail.split('@')[0]
@@ -206,7 +203,7 @@ router.get('/gmail/callback', async (req, res) => {
     const expiresAt = new Date(Date.now() + (tokens.expiry_date || 3600000));
     
     // Save connection with actual userId
-    await saveEmailConnection({
+    await databaseService.saveEmailConnection({
       userId: userId,
       email: userEmail || tokens.email,
       accessToken: tokens.access_token,
@@ -305,9 +302,9 @@ router.get('/gmail/callback', async (req, res) => {
  * GET /api/auth/status
  * Check if email is connected (protected route)
  */
-router.get('/status', authMiddleware, async (req, res) => {
+router.get('/status', (req, res, next) => authService.authMiddleware(req, res, next), async (req, res) => {
   try {
-    const connection = await getEmailConnection(req.user.userId);
+    const connection = await databaseService.getEmailConnection(req.user.userId);
     
     if (!connection) {
       return res.json({ 
@@ -328,7 +325,7 @@ router.get('/status', authMiddleware, async (req, res) => {
         const newTokens = await refreshAccessToken(connection.refreshToken);
         
         // Update tokens in database
-        await saveEmailConnection({
+        await databaseService.saveEmailConnection({
           userId: connection.userId,
           email: connection.email,
           accessToken: newTokens.access_token,
@@ -348,7 +345,7 @@ router.get('/status', authMiddleware, async (req, res) => {
         
         // Token refresh failed, clean up and inform user
         try {
-          await disconnectEmail(req.user.userId);
+          await databaseService.disconnectEmail(req.user.userId);
           console.log('🧹 Cleaned up expired connection');
         } catch (cleanupError) {
           console.error('Failed to cleanup connection:', cleanupError);
@@ -377,9 +374,9 @@ router.get('/status', authMiddleware, async (req, res) => {
  * POST /api/auth/disconnect
  * Disconnect email connection (protected route)
  */
-router.post('/disconnect', authMiddleware, async (req, res) => {
+router.post('/disconnect', (req, res, next) => authService.authMiddleware(req, res, next), async (req, res) => {
   try {
-    await disconnectEmail(req.user.userId);
+    await databaseService.disconnectEmail(req.user.userId);
     
     res.json({ 
       success: true,
@@ -395,9 +392,9 @@ router.post('/disconnect', authMiddleware, async (req, res) => {
  * POST /api/auth/refresh
  * Manually refresh access token (protected route)
  */
-router.post('/refresh', authMiddleware, async (req, res) => {
+router.post('/refresh', (req, res, next) => authService.authMiddleware(req, res, next), async (req, res) => {
   try {
-    const connection = await getEmailConnection(req.user.userId);
+    const connection = await databaseService.getEmailConnection(req.user.userId);
     
     if (!connection || !connection.refreshToken) {
       return res.status(400).json({ error: 'No active connection found' });
@@ -406,7 +403,7 @@ router.post('/refresh', authMiddleware, async (req, res) => {
     const newTokens = await refreshAccessToken(connection.refreshToken);
     
     // Update tokens in database
-    await saveEmailConnection({
+    await databaseService.saveEmailConnection({
       userId: connection.userId,
       email: connection.email,
       accessToken: newTokens.access_token,

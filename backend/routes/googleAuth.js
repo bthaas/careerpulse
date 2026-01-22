@@ -5,10 +5,12 @@
 
 import express from 'express';
 import { google } from 'googleapis';
-import { generateToken } from '../utils/auth.js';
-import { getUserByEmail, createUser } from '../database/db.js';
+import container from '../services/container.js';
 
 const router = express.Router();
+
+// Get services from container
+const { databaseService, authService } = container;
 
 // OAuth2 client for authentication (separate from Gmail API)
 const oauth2Client = new google.auth.OAuth2(
@@ -66,11 +68,11 @@ router.get('/google/callback', async (req, res) => {
     }
     
     // Check if user exists
-    let user = await getUserByEmail(data.email);
+    let user = await databaseService.getUserByEmail(data.email);
     
     if (!user) {
       // Create new user with null password (OAuth user)
-      const userId = await createUser({
+      const userId = await databaseService.createUser({
         email: data.email,
         password: null,
         name: data.name || data.email.split('@')[0]
@@ -84,7 +86,7 @@ router.get('/google/callback', async (req, res) => {
     }
     
     // Generate JWT token
-    const token = generateToken({ id: user.id, email: user.email });
+    const token = authService.generateToken({ id: user.id, email: user.email });
     
     // Redirect to frontend with token
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';

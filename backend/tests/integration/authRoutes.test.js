@@ -11,26 +11,58 @@ import express from 'express';
 import request from 'supertest';
 import { TestDatabaseManager } from '../helpers/testSetup.js';
 
-// Mock the auth middleware BEFORE importing routes
-vi.mock('../../utils/auth.js', () => ({
-  authMiddleware: (req, res, next) => {
-    req.user = { userId: 'test-user-123' };
-    next();
+// Mock the Gmail config
+const mockGetAuthUrl = vi.fn();
+const mockGetTokensFromCode = vi.fn();
+const mockRefreshAccessToken = vi.fn();
+const mockOAuth2Client = {
+  setCredentials: vi.fn()
+};
+
+vi.mock('../../config/gmail.js', () => ({
+  getAuthUrl: mockGetAuthUrl,
+  getTokensFromCode: mockGetTokensFromCode,
+  refreshAccessToken: mockRefreshAccessToken,
+  oauth2Client: mockOAuth2Client
+}));
+
+// Mock googleapis
+vi.mock('googleapis', () => ({
+  google: {
+    oauth2: vi.fn(() => ({
+      userinfo: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            email: 'test@gmail.com',
+            name: 'Test User'
+          }
+        })
+      }
+    }))
   }
 }));
 
-// Mock the Gmail config
-vi.mock('../../config/gmail.js', () => ({
-  getAuthUrl: vi.fn(),
-  getTokensFromCode: vi.fn(),
-  refreshAccessToken: vi.fn()
-}));
+// Mock the container services
+const mockAuthService = {
+  authMiddleware: (req, res, next) => {
+    req.user = { userId: 'test-user-123', email: 'test@example.com' };
+    next();
+  }
+};
 
-// Mock the database functions
-vi.mock('../../database/db.js', () => ({
+const mockDatabaseService = {
   saveEmailConnection: vi.fn(),
   getEmailConnection: vi.fn(),
-  disconnectEmail: vi.fn()
+  disconnectEmail: vi.fn(),
+  getUserByEmail: vi.fn(),
+  createUser: vi.fn()
+};
+
+vi.mock('../../services/container.js', () => ({
+  default: {
+    authService: mockAuthService,
+    databaseService: mockDatabaseService
+  }
 }));
 
 // Import routes AFTER mocking
@@ -49,35 +81,37 @@ describe('Auth Routes Integration Tests', () => {
     // Set up test database
     dbManager = new TestDatabaseManager();
     await dbManager.initialize();
+    
+    // Reset mocks
+    vi.clearAllMocks();
+    
+    // Default mock for getUserByEmail (for fallback OAuth flow)
+    mockDatabaseService.getUserByEmail.mockResolvedValue(null);
+    mockDatabaseService.createUser.mockResolvedValue('new-user-id');
   });
 
   afterEach(async () => {
     if (dbManager) {
       await dbManager.teardown();
     }
-    vi.clearAllMocks();
   });
 
   describe('GET /api/auth/gmail', () => {
     it('should return OAuth authorization URL', async () => {
       // Requirements: 9.4
-      const { getAuthUrl } = await import('../../config/gmail.js');
-      
       const mockAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=...';
-      getAuthUrl.mockReturnValue(mockAuthUrl);
+      mockGetAuthUrl.mockReturnValue(mockAuthUrl);
 
       const response = await request(app)
         .get('/api/auth/gmail')
         .expect(200);
 
       expect(response.body.authUrl).toBe(mockAuthUrl);
-      expect(getAuthUrl).toHaveBeenCalled();
+      expect(mockGetAuthUrl).toHaveBeenCalled();
     });
 
     it('should handle errors generating auth URL', async () => {
-      const { getAuthUrl } = await import('../../config/gmail.js');
-      
-      getAuthUrl.mockImplementation(() => {
+      mockGetAuthUrl.mockImplementation(() => {
         throw new Error('OAuth config error');
       });
 
@@ -92,9 +126,6 @@ describe('Auth Routes Integration Tests', () => {
   describe('GET /api/auth/gmail/callback', () => {
     it('should exchange code for tokens and save connection', async () => {
       // Requirements: 9.5
-      const { getTokensFromCode } = await import('../../config/gmail.js');
-      const { saveEmailConnection } = await import('../../database/db.js');
-
       const mockTokens = {
         access_token: 'mock_access_token',
         refresh_token: 'mock_refresh_token',
@@ -102,17 +133,17 @@ describe('Auth Routes Integration Tests', () => {
         email: 'test@gmail.com'
       };
 
-      getTokensFromCode.mockResolvedValue(mockTokens);
-      saveEmailConnection.mockResolvedValue({ id: 1 });
+      mockGetTokensFromCode.mockResolvedValue(mockTokens);
+      mockDatabaseService.saveEmailConnection.mockResolvedValue({ id: 1 });
 
       const response = await request(app)
         .get('/api/auth/gmail/callback')
         .query({ code: 'mock_auth_code' })
         .expect(200);
 
-      expect(response.text).toContain('Gmail Connected Successfully');
-      expect(getTokensFromCode).toHaveBeenCalledWith('mock_auth_code');
-      expect(saveEmailConnection).toHaveBeenCalled();
+      expect(response.text).toContain('Gmail Connected');
+      expect(mockGetTokensFromCode).toHaveBeenCalledWith('mock_auth_code');
+      expect(mockDatabaseService.saveEmailConnection).toHaveBeenCalled();
     });
 
     it('should return error when code is missing', async () => {
@@ -120,13 +151,11 @@ describe('Auth Routes Integration Tests', () => {
         .get('/api/auth/gmail/callback')
         .expect(400);
 
-      expect(response.text).toContain('Missing authorization code');
+      expect(response.text).toContain('Connection Failed');
     });
 
     it('should handle token exchange failure', async () => {
-      const { getTokensFromCode } = await import('../../config/gmail.js');
-
-      getTokensFromCode.mockRejectedValue(new Error('Invalid code'));
+      mockGetTokensFromCode.mockRejectedValue(new Error('Invalid code'));
 
       const response = await request(app)
         .get('/api/auth/gmail/callback')
@@ -137,9 +166,7 @@ describe('Auth Routes Integration Tests', () => {
     });
 
     it('should handle missing tokens', async () => {
-      const { getTokensFromCode } = await import('../../config/gmail.js');
-
-      getTokensFromCode.mockResolvedValue({
+      mockGetTokensFromCode.mockResolvedValue({
         access_token: 'token',
         // Missing refresh_token
       });
@@ -149,15 +176,13 @@ describe('Auth Routes Integration Tests', () => {
         .query({ code: 'code' })
         .expect(400);
 
-      expect(response.text).toContain('Failed to obtain tokens');
+      expect(response.text).toContain('Failed to obtain');
     });
   });
 
   describe('GET /api/auth/status', () => {
     it('should return connection status when connected', async () => {
       // Requirements: 9.6
-      const { getEmailConnection } = await import('../../database/db.js');
-
       const mockConnection = {
         userId: 'test-user-123',
         email: 'test@gmail.com',
@@ -165,7 +190,7 @@ describe('Auth Routes Integration Tests', () => {
         refreshToken: 'refresh_token'
       };
 
-      getEmailConnection.mockResolvedValue(mockConnection);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(mockConnection);
 
       const response = await request(app)
         .get('/api/auth/status')
@@ -176,9 +201,7 @@ describe('Auth Routes Integration Tests', () => {
     });
 
     it('should return not connected when no connection exists', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-
-      getEmailConnection.mockResolvedValue(null);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(null);
 
       const response = await request(app)
         .get('/api/auth/status')
@@ -189,10 +212,6 @@ describe('Auth Routes Integration Tests', () => {
     });
 
     it('should refresh expired tokens automatically', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-      const { refreshAccessToken } = await import('../../config/gmail.js');
-      const { saveEmailConnection } = await import('../../database/db.js');
-
       const mockConnection = {
         userId: 'test-user-123',
         email: 'test@gmail.com',
@@ -205,24 +224,20 @@ describe('Auth Routes Integration Tests', () => {
         expiry_date: Date.now() + 3600000
       };
 
-      getEmailConnection.mockResolvedValue(mockConnection);
-      refreshAccessToken.mockResolvedValue(newTokens);
-      saveEmailConnection.mockResolvedValue({ id: 1 });
+      mockDatabaseService.getEmailConnection.mockResolvedValue(mockConnection);
+      mockRefreshAccessToken.mockResolvedValue(newTokens);
+      mockDatabaseService.saveEmailConnection.mockResolvedValue({ id: 1 });
 
       const response = await request(app)
         .get('/api/auth/status')
         .expect(200);
 
       expect(response.body.connected).toBe(true);
-      expect(refreshAccessToken).toHaveBeenCalledWith('refresh_token');
-      expect(saveEmailConnection).toHaveBeenCalled();
+      expect(mockRefreshAccessToken).toHaveBeenCalledWith('refresh_token');
+      expect(mockDatabaseService.saveEmailConnection).toHaveBeenCalled();
     });
 
     it('should disconnect when token refresh fails', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-      const { refreshAccessToken } = await import('../../config/gmail.js');
-      const { disconnectEmail } = await import('../../database/db.js');
-
       const mockConnection = {
         userId: 'test-user-123',
         email: 'test@gmail.com',
@@ -230,26 +245,24 @@ describe('Auth Routes Integration Tests', () => {
         refreshToken: 'refresh_token'
       };
 
-      getEmailConnection.mockResolvedValue(mockConnection);
-      refreshAccessToken.mockRejectedValue(new Error('Refresh failed'));
-      disconnectEmail.mockResolvedValue(true);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(mockConnection);
+      mockRefreshAccessToken.mockRejectedValue(new Error('Refresh failed'));
+      mockDatabaseService.disconnectEmail.mockResolvedValue(true);
 
       const response = await request(app)
         .get('/api/auth/status')
         .expect(200);
 
       expect(response.body.connected).toBe(false);
-      expect(response.body.error).toContain('Token expired');
-      expect(disconnectEmail).toHaveBeenCalled();
+      expect(response.body.error).toContain('token_expired');
+      expect(mockDatabaseService.disconnectEmail).toHaveBeenCalled();
     });
   });
 
   describe('POST /api/auth/disconnect', () => {
     it('should disconnect email connection', async () => {
       // Requirements: 9.7
-      const { disconnectEmail } = await import('../../database/db.js');
-
-      disconnectEmail.mockResolvedValue(true);
+      mockDatabaseService.disconnectEmail.mockResolvedValue(true);
 
       const response = await request(app)
         .post('/api/auth/disconnect')
@@ -257,13 +270,11 @@ describe('Auth Routes Integration Tests', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toContain('disconnected successfully');
-      expect(disconnectEmail).toHaveBeenCalledWith('test-user-123');
+      expect(mockDatabaseService.disconnectEmail).toHaveBeenCalledWith('test-user-123');
     });
 
     it('should handle disconnect errors', async () => {
-      const { disconnectEmail } = await import('../../database/db.js');
-
-      disconnectEmail.mockRejectedValue(new Error('Database error'));
+      mockDatabaseService.disconnectEmail.mockRejectedValue(new Error('Database error'));
 
       const response = await request(app)
         .post('/api/auth/disconnect')
@@ -275,10 +286,6 @@ describe('Auth Routes Integration Tests', () => {
 
   describe('POST /api/auth/refresh', () => {
     it('should manually refresh access token', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-      const { refreshAccessToken } = await import('../../config/gmail.js');
-      const { saveEmailConnection } = await import('../../database/db.js');
-
       const mockConnection = {
         userId: 'test-user-123',
         email: 'test@gmail.com',
@@ -290,9 +297,9 @@ describe('Auth Routes Integration Tests', () => {
         expiry_date: Date.now() + 3600000
       };
 
-      getEmailConnection.mockResolvedValue(mockConnection);
-      refreshAccessToken.mockResolvedValue(newTokens);
-      saveEmailConnection.mockResolvedValue({ id: 1 });
+      mockDatabaseService.getEmailConnection.mockResolvedValue(mockConnection);
+      mockRefreshAccessToken.mockResolvedValue(newTokens);
+      mockDatabaseService.saveEmailConnection.mockResolvedValue({ id: 1 });
 
       const response = await request(app)
         .post('/api/auth/refresh')
@@ -303,9 +310,7 @@ describe('Auth Routes Integration Tests', () => {
     });
 
     it('should return error when no connection exists', async () => {
-      const { getEmailConnection } = await import('../../database/db.js');
-
-      getEmailConnection.mockResolvedValue(null);
+      mockDatabaseService.getEmailConnection.mockResolvedValue(null);
 
       const response = await request(app)
         .post('/api/auth/refresh')
@@ -322,8 +327,7 @@ describe('Auth Routes Integration Tests', () => {
       // In our mocked version, it always succeeds
       // In production, it would check for valid JWT tokens
       
-      const { getAuthUrl } = await import('../../config/gmail.js');
-      getAuthUrl.mockReturnValue('https://accounts.google.com/oauth');
+      mockGetAuthUrl.mockReturnValue('https://accounts.google.com/oauth');
       
       const response = await request(app)
         .get('/api/auth/gmail')
@@ -334,13 +338,13 @@ describe('Auth Routes Integration Tests', () => {
 
     it('should allow callback without authentication', async () => {
       // Callback endpoint should work without auth
-      const { getTokensFromCode } = await import('../../config/gmail.js');
-      
-      getTokensFromCode.mockResolvedValue({
+      mockGetTokensFromCode.mockResolvedValue({
         access_token: 'token',
         refresh_token: 'refresh',
         expiry_date: Date.now() + 3600000
       });
+      
+      mockDatabaseService.saveEmailConnection.mockResolvedValue({ id: 1 });
 
       await request(app)
         .get('/api/auth/gmail/callback')

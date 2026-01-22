@@ -1,7 +1,15 @@
 /**
- * API Service Client
- * Handles all communication with the backend API
+ * Backward-compatible functional wrapper for ApiClient
+ * Delegates to ApiClient class instance
  */
+
+import { ApiClient } from './ApiClient';
+
+// Create singleton instance
+const apiClient = new ApiClient();
+
+// Export class for new code
+export { ApiClient };
 
 export const API_URL = import.meta.env.PROD 
   ? 'https://api.jobfetch.app'
@@ -9,55 +17,12 @@ export const API_URL = import.meta.env.PROD
 
 const API_BASE_URL = `${API_URL}/api`;
 
-/**
- * Make API request with error handling
- */
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  // Get token from localStorage
-  const token = localStorage.getItem('auth_token');
-  
-  const config: RequestInit = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-    credentials: 'include', // Include cookies for session
-  };
-  
-  try {
-    const response = await fetch(url, config);
-    
-    // Handle non-2xx responses
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(errorData.error || `HTTP ${response.status}`);
-    }
-    
-    // Handle 204 No Content
-    if (response.status === 204) {
-      return null as T;
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`API Error (${endpoint}):`, error);
-    throw error;
-  }
-}
-
 // ========================================
 // Health Check
 // ========================================
 
 export async function checkHealth() {
-  return apiRequest<{ status: string; timestamp: string; version: string }>('/health');
+  return apiClient.checkHealth();
 }
 
 // ========================================
@@ -83,42 +48,31 @@ export interface Application {
 }
 
 export async function getAllApplications(): Promise<Application[]> {
-  return apiRequest<Application[]>('/applications');
+  return apiClient.getAllApplications();
 }
 
 export async function getApplication(id: string): Promise<Application> {
-  return apiRequest<Application>(`/applications/${id}`);
+  return apiClient.getApplication(id);
 }
 
 export async function createApplication(application: Partial<Application>): Promise<Application> {
-  return apiRequest<Application>('/applications', {
-    method: 'POST',
-    body: JSON.stringify(application),
-  });
+  return apiClient.createApplication(application);
 }
 
 export async function updateApplication(id: string, updates: Partial<Application>): Promise<Application> {
-  return apiRequest<Application>(`/applications/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(updates),
-  });
+  return apiClient.updateApplication(id, updates);
 }
 
 export async function updateApplicationStatus(id: string, status: Application['status']): Promise<Application> {
-  return apiRequest<Application>(`/applications/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status }),
-  });
+  return apiClient.updateApplicationStatus(id, status);
 }
 
 export async function deleteApplication(id: string): Promise<void> {
-  return apiRequest<void>(`/applications/${id}`, {
-    method: 'DELETE',
-  });
+  return apiClient.deleteApplication(id);
 }
 
 export async function getApplicationHistory(id: string): Promise<any[]> {
-  return apiRequest<any[]>(`/applications/${id}/history`);
+  return apiClient.getApplicationHistory(id);
 }
 
 // ========================================
@@ -131,23 +85,19 @@ export interface AuthStatus {
 }
 
 export async function getAuthUrl(): Promise<{ authUrl: string }> {
-  return apiRequest<{ authUrl: string }>('/auth/gmail');
+  return apiClient.getAuthUrl();
 }
 
 export async function getAuthStatus(): Promise<AuthStatus> {
-  return apiRequest<AuthStatus>('/auth/status');
+  return apiClient.getAuthStatus();
 }
 
 export async function disconnectEmail(): Promise<{ success: boolean; message: string }> {
-  return apiRequest<{ success: boolean; message: string }>('/auth/disconnect', {
-    method: 'POST',
-  });
+  return apiClient.disconnectEmail();
 }
 
 export async function refreshToken(): Promise<{ success: boolean; message: string }> {
-  return apiRequest<{ success: boolean; message: string }>('/auth/refresh', {
-    method: 'POST',
-  });
+  return apiClient.refreshToken();
 }
 
 // ========================================
@@ -170,32 +120,15 @@ export interface SyncResult {
 }
 
 export async function syncEmails(options?: { maxResults?: number; afterDate?: string }): Promise<SyncResult> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
-  
-  try {
-    const result = await apiRequest<SyncResult>('/email/sync', {
-      method: 'POST',
-      body: JSON.stringify(options || {}),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return result;
-  } catch (error: any) {
-    clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      throw new Error('Sync is taking longer than expected. Please check your applications list - some may have been added.');
-    }
-    throw error;
-  }
+  return apiClient.syncEmails(options);
 }
 
 export async function getEmailProfile(): Promise<{ email: string; messagesTotal: number; threadsTotal: number }> {
-  return apiRequest<{ email: string; messagesTotal: number; threadsTotal: number }>('/email/profile');
+  return apiClient.getEmailProfile();
 }
 
 export async function getEmailStatus(): Promise<{ connected: boolean; email: string | null; lastSync: string | null }> {
-  return apiRequest<{ connected: boolean; email: string | null; lastSync: string | null }>('/email/status');
+  return apiClient.getEmailStatus();
 }
 
 export default {
@@ -215,3 +148,6 @@ export default {
   getEmailProfile,
   getEmailStatus,
 };
+
+// Export singleton instance
+export { apiClient };
