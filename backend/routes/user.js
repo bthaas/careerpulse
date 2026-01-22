@@ -42,7 +42,7 @@ router.post('/signup', async (req, res) => {
     });
     
     // Generate token
-    const token = authService.generateToken(userId, email.toLowerCase());
+    const token = authService.generateToken({ userId, email: email.toLowerCase() });
     
     res.status(201).json({
       success: true,
@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
     }
     
     // Generate token
-    const token = authService.generateToken(user.id, user.email);
+    const token = authService.generateToken({ userId: user.id, email: user.email });
     
     res.json({
       success: true,
