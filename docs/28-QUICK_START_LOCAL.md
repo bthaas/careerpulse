@@ -34,7 +34,7 @@ In a new terminal:
 
 ```bash
 cd backend
-./test-local.sh
+../test-local.sh
 ```
 
 This will test:

@@ -34,7 +34,7 @@ curl http://localhost:3001/api/health
 ### Full Test Suite
 ```bash
 cd backend
-./test-simple.sh
+../test-simple.sh
 ```
 
 ## What Works
@@ -101,7 +101,7 @@ curl http://localhost:3001/api/applications \
 | Component | Local (Now) | Production (Railway) |
 |-----------|-------------|---------------------|
 | **Backend** | `http://localhost:3001` | `https://api.jobfetch.app` |
-| **Database** | `./database/careerpulse.db` | `/app/database/jobfetch.db` |
+| **Database** | `../database/careerpulse.db` | `/app/database/jobfetch.db` |
 | **Code** | Your local files | Same code from GitHub |
 | **APIs** | Same APIs | Same APIs |
 | **Keys** | From `.env` file | From Railway env vars |

@@ -25,7 +25,7 @@ All critical systems are operational and properly configured. The application is
 | Variable | Status | Value (masked) | Notes |
 |----------|--------|----------------|-------|
 | PORT | ✅ | 3001 | Correct |
-| DATABASE_PATH | ✅ | ./database/careerpulse.db | File exists |
+| DATABASE_PATH | ✅ | ../database/careerpulse.db | File exists |
 | JWT_SECRET | ✅ | dev-jwt-secret-*** | ⚠️ Change in production |
 | SESSION_SECRET | ✅ | dev-secret-*** | ⚠️ Change in production |
 | GOOGLE_CLIENT_ID | ✅ | 403147820866-*** | Valid format |

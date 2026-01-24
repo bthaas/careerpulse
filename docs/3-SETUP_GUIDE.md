@@ -99,7 +99,7 @@ JWT_SECRET=your_random_jwt_secret_here_change_this
 SESSION_SECRET=your_random_session_secret_here_change_this
                               
 # Database
-DATABASE_PATH=./database/careerpulse.db
+DATABASE_PATH=../database/careerpulse.db
 ```
 
 💡 **Tip**: Generate secure secrets:

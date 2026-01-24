@@ -184,7 +184,7 @@ python-dotenv==1.0.0
 ```env
 # Backend
 PORT=3001
-DATABASE_URL=./careerpulse.db
+DATABASE_URL=../careerpulse.db
 JWT_SECRET=your-secret-key
 
 # Gmail OAuth

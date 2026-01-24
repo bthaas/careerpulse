@@ -24,7 +24,7 @@ PORT=3001
 NODE_ENV=development
 
 # Database
-DATABASE_PATH=./database/careerpulse.db
+DATABASE_PATH=../database/careerpulse.db
 
 # JWT Secret (generate with: openssl rand -base64 32)
 JWT_SECRET=your-secret-key-here
@@ -327,7 +327,7 @@ elif [ "$1" == "prod" ]; then
   export NODE_ENV="production"
   echo "✅ Switched to PRODUCTION"
 else
-  echo "Usage: ./switch-env.sh [local|prod]"
+  echo "Usage: ../switch-env.sh [local|prod]"
 fi
 ```
 

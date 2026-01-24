@@ -68,7 +68,7 @@ SESSION_SECRET=<generate-strong-random-string>
 JWT_SECRET=<generate-strong-random-string>
 
 # Database
-DATABASE_PATH=./database/careerpulse.db
+DATABASE_PATH=../database/careerpulse.db
 
 # Frontend URL
 FRONTEND_URL=https://yourdomain.com
@@ -264,10 +264,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY backend/package*.json ./
+COPY backend/package*.json ../
 RUN npm ci --only=production
 
-COPY backend/ ./
+COPY backend/ ../
 
 EXPOSE 3001
 
@@ -280,7 +280,7 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json ../
 RUN npm ci
 
 COPY . .
@@ -312,7 +312,7 @@ services:
       - SESSION_SECRET=${SESSION_SECRET}
       - JWT_SECRET=${JWT_SECRET}
     volumes:
-      - ./backend/database:/app/database
+      - ../backend/database:/app/database
     restart: unless-stopped
 
   frontend:

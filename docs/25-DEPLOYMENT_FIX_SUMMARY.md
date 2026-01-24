@@ -36,13 +36,13 @@ backend/services/
 
 ## Changes Made
 All imports now correctly match the actual filenames:
-- `DatabaseService.js` → `import { DatabaseService } from './DatabaseService.js'`
-- `AuthService.js` → `import { AuthService } from './AuthService.js'`
-- `FileParserService.js` → `import { FileParserService } from './FileParserService.js'`
-- `gmailService.js` → `import { GmailService } from './gmailService.js'`
-- `emailParser.js` → `import { EmailParser } from './emailParser.js'`
-- `llmParser.js` → `import { LLMParser } from './llmParser.js'`
-- `duplicateDetector.js` → `import { DuplicateDetector } from './duplicateDetector.js'`
+- `DatabaseService.js` → `import { DatabaseService } from '../DatabaseService.js'`
+- `AuthService.js` → `import { AuthService } from '../AuthService.js'`
+- `FileParserService.js` → `import { FileParserService } from '../FileParserService.js'`
+- `gmailService.js` → `import { GmailService } from '../gmailService.js'`
+- `emailParser.js` → `import { EmailParser } from '../emailParser.js'`
+- `llmParser.js` → `import { LLMParser } from '../llmParser.js'`
+- `duplicateDetector.js` → `import { DuplicateDetector } from '../duplicateDetector.js'`
 
 ## Deployment Status
 - ✅ Code committed to GitHub (commit: 8854ae8)

@@ -44,7 +44,7 @@ npm start
 | **Backend URL** | `http://localhost:3001` | `https://api.jobfetch.app` |
 | **Frontend URL** | `http://localhost:5173` | `https://jobfetch.app` |
 | **Google Redirect** | `http://localhost:3001/api/auth/google/callback` | `https://api.jobfetch.app/api/auth/google/callback` |
-| **Database Path** | `./database/careerpulse.db` | `/app/database/jobfetch.db` |
+| **Database Path** | `../database/careerpulse.db` | `/app/database/jobfetch.db` |
 | **Port** | `3001` | `8080` (Railway assigns) |
 | **NODE_ENV** | `development` | `production` |
 
@@ -90,7 +90,7 @@ Backend runs at: `http://localhost:3001`
 ```bash
 # Run automated tests
 chmod +x backend/test-local.sh
-./backend/test-local.sh
+../backend/test-local.sh
 
 # Or test manually
 curl http://localhost:3001/api/health
@@ -159,7 +159,7 @@ cp .env.local .env
 npm start
 
 # 2. Run test script
-./test-local.sh
+../test-local.sh
 
 # 3. Or use curl/Postman to test endpoints
 curl http://localhost:3001/api/health
@@ -185,7 +185,7 @@ git push origin main
 - [ ] `FRONTEND_URL=http://localhost:5173`
 - [ ] `GOOGLE_REDIRECT_URI=http://localhost:3001/api/auth/google/callback`
 - [ ] `NODE_ENV=development`
-- [ ] `DATABASE_PATH=./database/careerpulse.db`
+- [ ] `DATABASE_PATH=../database/careerpulse.db`
 
 ### Backend Production (Railway)
 - [ ] `PORT=8080` (or Railway assigned)
@@ -233,7 +233,7 @@ git push origin main
 **Cause**: Wrong database path for environment
 
 **Solution**:
-- Localhost: `DATABASE_PATH=./database/careerpulse.db`
+- Localhost: `DATABASE_PATH=../database/careerpulse.db`
 - Production: `DATABASE_PATH=/app/database/jobfetch.db`
 
 ## Quick Reference Commands
@@ -243,7 +243,7 @@ git push origin main
 cd backend && cp .env.local .env && npm start
 
 # Test backend
-./backend/test-local.sh
+../backend/test-local.sh
 
 # Check backend health
 curl http://localhost:3001/api/health
@@ -266,7 +266,7 @@ git push origin main
 **For Local Development:**
 1. Copy `backend/.env.local` to `backend/.env`
 2. Start backend: `npm start`
-3. Test with `./test-local.sh` or curl
+3. Test with `../test-local.sh` or curl
 4. When you get frontend: Create `.env.local` with `VITE_API_URL=http://localhost:3001`
 
 **For Production:**

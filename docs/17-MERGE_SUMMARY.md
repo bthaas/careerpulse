@@ -162,7 +162,7 @@ SECRET_MANAGER_PROJECT_ID=your_project_id
 
 # Server
 PORT=3001
-DATABASE_PATH=./database/careerpulse.db
+DATABASE_PATH=../database/careerpulse.db
 ```
 
 ## Testing the Merge

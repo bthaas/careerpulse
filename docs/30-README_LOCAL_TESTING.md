@@ -16,7 +16,7 @@ npm install
 npm start
 
 # 3. Run automated tests
-./test-local.sh
+../test-local.sh
 ```
 
 That's it! The test script will:
@@ -73,7 +73,7 @@ That's it! The test script will:
 ### Option 1: Automated (Recommended)
 ```bash
 cd backend
-./test-local.sh
+../test-local.sh
 ```
 
 ### Option 2: Manual Testing
@@ -115,7 +115,7 @@ When you're ready to connect to production:
 |------|-----------|------------|
 | Backend URL | `http://localhost:3001` | `https://api.jobfetch.app` |
 | Frontend URL | `http://localhost:5173` | `https://jobfetch.app` |
-| Database | `./database/careerpulse.db` | `/app/database/jobfetch.db` |
+| Database | `../database/careerpulse.db` | `/app/database/jobfetch.db` |
 | Environment | `development` | `production` |
 
 ## What Works Now
@@ -141,7 +141,7 @@ When you're ready to connect to production:
 ## Next Steps
 
 ### Now (Without Frontend Access)
-1. Run `./backend/test-local.sh` to verify everything works
+1. Run `../backend/test-local.sh` to verify everything works
 2. Test Gmail connection using the OAuth URL from the script
 3. Sync some emails and verify they're parsed correctly
 4. Familiarize yourself with the API endpoints
@@ -169,7 +169,7 @@ When you're ready to connect to production:
 - Check it's on port 3001: `curl http://localhost:3001/api/health`
 
 ### "Authentication required"
-- Get a fresh token by running `./test-local.sh`
+- Get a fresh token by running `../test-local.sh`
 - Or login manually and copy the token from response
 
 ### "Gmail connection failed"

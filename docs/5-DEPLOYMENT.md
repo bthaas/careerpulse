@@ -64,7 +64,7 @@ SESSION_SECRET=your_generated_session_secret
 FRONTEND_URL=https://jobfetch.app
 
 # Database
-DATABASE_PATH=./database/jobfetch.db
+DATABASE_PATH=../database/jobfetch.db
 ```
 
 ### 1.3 Configure Build Settings
@@ -137,7 +137,7 @@ vercel
 3. Import `careerpulse` from GitHub
 4. Configure:
    - **Framework Preset:** Vite
-   - **Root Directory:** `./`
+   - **Root Directory:** `../`
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
    - **Install Command:** `npm install`
