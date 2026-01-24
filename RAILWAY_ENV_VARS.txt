@@ -14,9 +14,9 @@ FRONTEND_URL=https://jobfetch.app
 
 API_URL=https://api.jobfetch.app
 
-JWT_SECRET=QWWQom+d6W+hYL+7HE/CXqN7wgi0DMX4NbXythE8nCQ=
+JWT_SECRET=your-jwt-secret-here
 
-SESSION_SECRET=GK7RozzxDEQFUSZYMMXj4XWA08T6X2seJVnRxnxVhfU=
+SESSION_SECRET=your-session-secret-here
 
 DATABASE_PATH=/app/database/jobfetch.db
 
