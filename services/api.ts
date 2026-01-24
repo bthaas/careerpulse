@@ -11,9 +11,7 @@ const apiClient = new ApiClient();
 // Export class for new code
 export { ApiClient };
 
-export const API_URL = import.meta.env.PROD 
-  ? 'https://api.jobfetch.app'
-  : 'http://localhost:3001';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://api.jobfetch.app';
 
 const API_BASE_URL = `${API_URL}/api`;
 

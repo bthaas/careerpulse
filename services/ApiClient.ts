@@ -84,9 +84,8 @@ export class ApiClient {
    * @private
    */
   private _getDefaultBaseUrl(): string {
-    const apiUrl = import.meta.env.PROD 
-      ? 'https://api.jobfetch.app'
-      : 'http://localhost:3001';
+    // Use VITE_API_URL from environment, fallback to production URL
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://api.jobfetch.app';
     return `${apiUrl}/api`;
   }
 
