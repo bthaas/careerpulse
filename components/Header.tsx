@@ -1,4 +1,7 @@
 import React from 'react';
+import { Application } from '../types';
+import { FunnelButton } from './FunnelButton';
+import { FunnelModal } from './FunnelModal';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -11,14 +14,16 @@ interface HeaderProps {
   isSyncing?: boolean;
   onLogout?: () => void;
   user?: { name?: string; email?: string };
+  applications?: Application[];
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVImportClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout, user }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVImportClick, searchQuery, onSearch, onSyncEmails, isSyncing = false, onLogout, user, applications = [] }) => {
   const [showUserMenu, setShowUserMenu] = React.useState(false);
+  const [showFunnelModal, setShowFunnelModal] = React.useState(false);
   
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#101922]/90 backdrop-blur-sm">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
@@ -48,6 +53,11 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVI
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
+            <FunnelButton
+              applications={applications}
+              onClick={() => setShowFunnelModal(true)}
+            />
+
             <button 
               onClick={onAddClick}
               className="hidden sm:flex items-center gap-2 h-9 px-4 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
@@ -157,6 +167,13 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDark, onAddClick, onCSVI
           </div>
         </div>
       </div>
+
+      {/* Funnel Modal */}
+      <FunnelModal
+        isOpen={showFunnelModal}
+        onClose={() => setShowFunnelModal(false)}
+        applications={applications}
+      />
     </header>
   );
 };
