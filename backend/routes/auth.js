@@ -127,6 +127,21 @@ router.get('/gmail/callback', async (req, res) => {
       userId = stateData.userId;
       userEmail = stateData.email;
       console.log('✅ State validated for user:', userId);
+      
+      // Verify user exists in database (they should be logged in)
+      const user = await databaseService.getUserById(userId);
+      if (!user) {
+        console.error('❌ User not found in database:', userId);
+        return res.status(400).send(`
+          <html>
+            <body>
+              <h1>❌ Connection Failed</h1>
+              <p>User not found. Please sign in first.</p>
+              <p>Close this window and sign in to your account before connecting Gmail.</p>
+            </body>
+          </html>
+        `);
+      }
     } else {
       // FALLBACK: State parameter missing (Google OAuth config issue)
       console.warn('⚠️  State parameter missing - using fallback method');
@@ -200,7 +215,10 @@ router.get('/gmail/callback', async (req, res) => {
     }
     
     // Calculate token expiration
-    const expiresAt = new Date(Date.now() + (tokens.expiry_date || 3600000));
+    // tokens.expiry_date is already a timestamp in milliseconds
+    const expiresAt = tokens.expiry_date 
+      ? new Date(tokens.expiry_date)
+      : new Date(Date.now() + 3600000); // Default to 1 hour if not provided
     
     // Save connection with actual userId
     await databaseService.saveEmailConnection({
@@ -245,12 +263,18 @@ router.get('/gmail/callback', async (req, res) => {
             <div class="icon">✅</div>
             <h1>Gmail Connected!</h1>
             <p>Your Gmail account has been successfully connected.</p>
-            <p style="margin-top: 1.5rem; font-size: 0.875rem;">You can now close this window and return to CareerPulse.</p>
+            <p style="margin-top: 1.5rem; font-size: 0.875rem;">Closing window...</p>
           </div>
           <script>
+            // Notify parent window of success
+            if (window.opener) {
+              window.opener.postMessage({ type: 'gmail-connected', success: true }, '*');
+            }
+            
+            // Close window after a short delay
             setTimeout(() => {
               window.close();
-            }, 2000);
+            }, 1500);
           </script>
         </body>
       </html>
